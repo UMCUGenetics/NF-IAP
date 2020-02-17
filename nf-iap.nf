@@ -43,19 +43,19 @@ workflow {
     }
 
     if (params.fastq_path){
-      // premap_QC(input_fastqs)
+      premap_QC(input_fastqs)
       bwa_mapping(input_fastqs)
     }
 
     if ( bwa_mapping.out && params.bam_path ){
-      // postmap_QC( bwa_mapping.out.mix( input_bams ))
+      postmap_QC( bwa_mapping.out.mix( input_bams ))
       gatk_bqsr( bwa_mapping.out.mix(input_bams) )
     }else if ( bwa_mapping.out ){
-      // postmap_QC( bwa_mapping.out )
+      postmap_QC( bwa_mapping.out )
       gatk_bqsr( bwa_mapping.out )
     }else{
       gatk_bqsr( input_bams )
-      // postmap_QC( input_bams )
+      postmap_QC( input_bams )
     }
 
     if ( gatk_bqsr.out && input_gvcf){
@@ -63,7 +63,6 @@ workflow {
     }else{
       gatk_germline_calling(gatk_bqsr.out, Channel.empty() )
     }
-
 
     gatk_variantfiltration(gatk_germline_calling.out[0])
 
