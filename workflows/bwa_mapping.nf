@@ -5,10 +5,10 @@ workflow bwa_mapping {
   get:
     fastqs
   main:
-    /* Run mapping on a per sample per lane basis */
+    // Run mapping on a per sample per lane basis
     BWAMapping(fastqs)
 
-    /* Mark duplicates & Merge lane bam files*/
+    // Mark duplicates & Merge lane bam files
     MarkDup(BWAMapping.out.groupTuple())
   emit:
     MarkDup.out

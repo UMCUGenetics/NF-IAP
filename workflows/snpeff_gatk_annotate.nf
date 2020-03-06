@@ -8,16 +8,16 @@ workflow snpeff_gatk_annotate {
   get:
     vcfs
   main:
-    /* Run snpEffFilter annotation step*/
+    //Run snpEffFilter annotation step
     snpEffFilter(vcfs)
 
-    /* Run snpSift filter step*/
+    // Run snpSift filter step
     SnpSiftDbnsfp(snpEffFilter.out)
 
-    /* Run GATK Cosmic annotation step*/
+    //Run GATK Cosmic annotation step
     VariantAnnotator(SnpSiftDbnsfp.out)
 
-    /* Run snpSift GoNL annotation step*/
+    //Run snpSift GoNL annotation step
     SnpSiftAnnotate(VariantAnnotator.out)
 
   emit:

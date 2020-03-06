@@ -9,22 +9,22 @@ workflow gatk_bqsr {
     sample_bams
 
   main:
-    /* Create intervals to scatter/gather over */
+    // Create intervals to scatter/gather over
     SplitIntervals( 'no-break', Channel.fromPath( params.scatter_interval_list) )
 
-    /* Create base recalibration table per interval per sample*/
+    // Create base recalibration table per interval per sample
     BaseRecalibrationTable( sample_bams.combine(SplitIntervals.out.flatten()) )
 
-    /* Merge the base recalibration tables per samples*/
+    // Merge the base recalibration tables per samples
     GatherBaseRecalibrationTables(BaseRecalibrationTable.out.groupTuple())
 
-    /* Apply the base relalibration per interval per sample */
+    // Apply the base relalibration per interval per sample
     BaseRecalibration(
       sample_bams
         .combine(GatherBaseRecalibrationTables.out, by:0)
         .combine(SplitIntervals.out.flatten())
     )
-    //BaseRecalibration.out.groupTuple().view()
+    // Merge the bam files on a per sample basis
     MergeBams(
       BaseRecalibration.out
         .groupTuple()

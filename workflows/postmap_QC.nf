@@ -7,29 +7,19 @@ workflow postmap_QC {
     bams
   main:
     run_id = params.out_dir.split('/')[-1]
-    /* Run CollectMultipleMetrics per sample */
+    //Run CollectMultipleMetrics per sample
     CollectMultipleMetrics(
       bams.map{
         sample_id, bam, bai -> [sample_id, bam]
       }
     )
-    /* Run WGSMetrics per sample */
+    // Run WGSMetrics per sample
     CollectWGSMetrics(
       bams.map{
         sample_id, bam, bai -> [sample_id, bam]
       }
     )
-
-    /* Run MultiQC (wait for last process to finish) */
-    //MultiQC( MergeVCFChunks.out.map{ id, vcf, idx -> id } )
-    MultiQC(
+    emit:
+      CollectWGSMetrics.out
       CollectMultipleMetrics.out
-        .combine(CollectWGSMetrics.out)
-        .map {
-          it -> run_id
-        }
-    )
-
-
-
 }

@@ -6,7 +6,7 @@ workflow gatk_variantfiltration {
   get:
     vcfs
   main:
-    /* Select SNPs and INDELs for variant filtration per interval*/
+    // Select SNPs and INDELs for variant filtration per interval
     SelectVariants(
       vcfs
         .map{
@@ -16,10 +16,10 @@ workflow gatk_variantfiltration {
         .combine(['SNP', 'INDEL'])
     )
 
-    /* Perform variant filtration for SNPs and INDELs per interval*/
+    // Perform variant filtration for SNPs and INDELs per interval
     VariantFiltration(SelectVariants.out)
 
-    /* Merge genotyped vcf files */
+    // Merge genotyped vcf files
     MergeVCF(
       VariantFiltration.out.groupTuple().map{
         run_id, intervals, types,vcfs, idxs ->
