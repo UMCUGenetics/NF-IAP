@@ -1,7 +1,7 @@
-include MultiQC from '/hpc/cog_bioinf/cuppen/personal_data/sander/scripts/Nextflow/NextflowModules/MultiQC/1.5/MultiQC.nf' params(params)
+include MultiQC from 'NextflowModules/MultiQC/1.5/MultiQC.nf' params(params)
 
 workflow summary_QC {
-  get:
+  take:
     qc_files
   main:
 

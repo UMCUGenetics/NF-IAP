@@ -1,11 +1,11 @@
-include HaplotypeCaller from '/hpc/cog_bioinf/cuppen/personal_data/sander/scripts/Nextflow/NextflowModules/GATK/4.1.3.0/HaplotypeCaller.nf' params(params)
-include CombineGVCFs from '/hpc/cog_bioinf/cuppen/personal_data/sander/scripts/Nextflow/NextflowModules/GATK/4.1.3.0/CombineGVCFs.nf' params(params)
-include MergeVCFs as MergeGVCF from '/hpc/cog_bioinf/cuppen/personal_data/sander/scripts/Nextflow/NextflowModules/GATK/4.1.3.0/MergeVCFs.nf' params(params)
-include GenotypeGVCFs from '/hpc/cog_bioinf/cuppen/personal_data/sander/scripts/Nextflow/NextflowModules/GATK/4.1.3.0/GenotypeGVCFs.nf' params(params)
-include SplitIntervals from '/hpc/cog_bioinf/cuppen/personal_data/sander/scripts/Nextflow/NextflowModules/GATK/4.1.3.0/SplitIntervals.nf' params(params)
+include HaplotypeCaller from 'NextflowModules/GATK/4.1.3.0/HaplotypeCaller.nf' params(params)
+include CombineGVCFs from 'NextflowModules/GATK/4.1.3.0/CombineGVCFs.nf' params(params)
+include MergeVCFs as MergeGVCF from 'NextflowModules/GATK/4.1.3.0/MergeVCFs.nf' params(params)
+include GenotypeGVCFs from 'NextflowModules/GATK/4.1.3.0/GenotypeGVCFs.nf' params(params)
+include SplitIntervals from 'NextflowModules/GATK/4.1.3.0/SplitIntervals.nf' params(params)
 
 workflow gatk_germline_calling {
-  get:
+  take:
     sample_bams
     sample_gvcfs
   main:

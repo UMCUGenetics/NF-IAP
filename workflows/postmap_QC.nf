@@ -1,9 +1,9 @@
-include CollectMultipleMetrics from '/hpc/cog_bioinf/cuppen/personal_data/sander/scripts/Nextflow/NextflowModules/GATK/4.1.3.0/CollectMultipleMetrics.nf' params(params)
-include CollectWGSMetrics from '/hpc/cog_bioinf/cuppen/personal_data/sander/scripts/Nextflow/NextflowModules/GATK/4.1.3.0/CollectWGSMetrics.nf' params(params)
-include MultiQC from '/hpc/cog_bioinf/cuppen/personal_data/sander/scripts/Nextflow/NextflowModules/MultiQC/1.5/MultiQC.nf' params(params)
+include CollectMultipleMetrics from 'NextflowModules/GATK/4.1.3.0/CollectMultipleMetrics.nf' params(params)
+include CollectWGSMetrics from 'NextflowModules/GATK/4.1.3.0/CollectWGSMetrics.nf' params(params)
+include MultiQC from 'NextflowModules/MultiQC/1.5/MultiQC.nf' params(params)
 
 workflow postmap_QC {
-  get:
+  take:
     bams
   main:
     run_id = params.out_dir.split('/')[-1]
