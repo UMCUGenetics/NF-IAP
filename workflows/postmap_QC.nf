@@ -1,6 +1,6 @@
-include CollectMultipleMetrics from 'NextflowModules/GATK/4.1.3.0/CollectMultipleMetrics.nf' params(params)
-include CollectWGSMetrics from 'NextflowModules/GATK/4.1.3.0/CollectWGSMetrics.nf' params(params)
-include MultiQC from 'NextflowModules/MultiQC/1.5/MultiQC.nf' params(params)
+include CollectMultipleMetrics from '../NextflowModules/GATK/4.1.3.0/CollectMultipleMetrics.nf' params(params)
+include CollectWGSMetrics from '../NextflowModules/GATK/4.1.3.0/CollectWGSMetrics.nf' params(params)
+include MultiQC from '../NextflowModules/MultiQC/1.5/MultiQC.nf' params(params)
 
 workflow postmap_QC {
   take:

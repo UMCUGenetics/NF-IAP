@@ -2,28 +2,29 @@
 
 nextflow.preview.dsl=2
 
-include extractFastqFromDir from 'NextflowModules/Utils/fastq.nf'
-include extractBamFromDir from 'NextflowModules/Utils/bam.nf'
-include extractGVCFFromDir from 'NextflowModules/Utils/gvcf.nf'
-include extractVCFFromDir from 'NextflowModules/Utils/vcf.nf'
-include premap_QC from 'workflows/premap_QC.nf' params(params)
-include postmap_QC from 'workflows/postmap_QC.nf' params(params)
-include summary_QC from 'workflows/summary_QC.nf' params(params)
-include bwa_mapping from 'workflows/bwa_mapping.nf' params(params)
-include gatk_bqsr from 'workflows/gatk_bqsr.nf' params(params)
-include gatk_germline_calling from 'workflows/gatk_germline_calling.nf' params(params)
-include gatk_variantfiltration from 'workflows/gatk_variantfiltration.nf' params(params)
-include snpeff_gatk_annotate from 'workflows/snpeff_gatk_annotate.nf' params(params)
+include './NextflowModules/Utils/fastq.nf'
+include extractBamFromDir from './NextflowModules/Utils/bam.nf'
+include extractGVCFFromDir from './NextflowModules/Utils/gvcf.nf'
+include extractVCFFromDir from './NextflowModules/Utils/vcf.nf'
+include premap_QC from './workflows/premap_QC.nf' params(params)
+include postmap_QC from './workflows/postmap_QC.nf' params(params)
+include summary_QC from './workflows/summary_QC.nf' params(params)
+include bwa_mapping from './workflows/bwa_mapping.nf' params(params)
+include gatk_bqsr from './workflows/gatk_bqsr.nf' params(params)
+include gatk_germline_calling from './workflows/gatk_germline_calling.nf' params(params)
+include gatk_variantfiltration from './workflows/gatk_variantfiltration.nf' params(params)
+include snpeff_gatk_annotate from './workflows/snpeff_gatk_annotate.nf' params(params)
 
 /*  Check if all necessary input parameters are present */
 if ( (!params.fastq_path && !params.bam_path && !params.gvcf_path ) && !params.vcf_path){
-  exit 1, "Please provide either a fastq_path, bam_path or gvcf_path!"
+  exit 1, "Please provide either a 'fastq_path', 'bam_path', 'gvcf_path' or 'vcf_path'. You can provide these parameters either in the <analysis_name>.config file or on the commandline (add -- in front of the parameter)."
 }
 
 if (!params.out_dir){
-  exit 1, "No 'out_dir' parameter found in config file!"
+  exit 1, "No 'out_dir' parameter found in <analysis_name>.config file or on the commandline (add -- in front of the parameter)."
 }
 
+workDir = params.out_dir
 
 workflow {
   main :

@@ -1,4 +1,4 @@
-include MultiQC from 'NextflowModules/MultiQC/1.5/MultiQC.nf' params(params)
+include MultiQC from '../NextflowModules/MultiQC/1.5/MultiQC.nf' params(params)
 
 workflow summary_QC {
   take:

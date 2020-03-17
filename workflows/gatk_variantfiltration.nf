@@ -1,6 +1,6 @@
-include SelectVariants from 'NextflowModules/GATK/4.1.3.0/SelectVariants.nf' params(params)
-include VariantFiltration from 'NextflowModules/GATK/4.1.3.0/VariantFiltration.nf' params(params)
-include MergeVCFs as MergeVCF from 'NextflowModules/GATK/4.1.3.0/MergeVCFs.nf' params(params)
+include SelectVariants from '../NextflowModules/GATK/4.1.3.0/SelectVariants.nf' params(params)
+include VariantFiltration from '../NextflowModules/GATK/4.1.3.0/VariantFiltration.nf' params(params)
+include MergeVCFs as MergeVCF from '../NextflowModules/GATK/4.1.3.0/MergeVCFs.nf' params(params)
 
 workflow gatk_variantfiltration {
   take:

@@ -1,4 +1,4 @@
-include FastQC from 'NextflowModules/FastQC/0.11.5/FastQC.nf' params(params)
+include FastQC from '../NextflowModules/FastQC/0.11.5/FastQC' params(params)
 
 workflow premap_QC {
   take:
