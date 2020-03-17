@@ -7,23 +7,13 @@ Nextflow Illumina Analysis Pipeline. Includes pre/post-mapping QC, BWA mapping &
 These instructions will help you get a copy of the workflow running on your own machine or cluster.
 
 
-### 
-
-What things you need to install the software and how to install them
-
-```
-Give examples
-```
-
 ### Installing
 
-A step by step series of examples that tell you how to get a development env running
+Install the latest version of Nextflow
 
-Say what the step will be
 
-```
-Give the example
-```
+https://www.nextflow.io/docs/latest/getstarted.html#installation
+
 
 And repeat
 
