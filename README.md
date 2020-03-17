@@ -12,5 +12,6 @@ These instructions will help you get a copy of the workflow running on your own 
 1. [Install Nextflow](https://www.nextflow.io/docs/latest/getstarted.html#installation)
 2. [Pull NF-IAP](https://github.com/UMCUGenetics/NF-IAP)
 3. [Get & configure resources](docs/resources.md)
+4. [Configure nextflow](docs.nextflow.md)
 
 
