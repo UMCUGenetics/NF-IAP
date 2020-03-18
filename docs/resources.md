@@ -56,6 +56,29 @@ Download all snp_indels files from https://molgenis26.target.rug.nl/downloads/go
 Combine all .vcf.gz files together and sort them, we used picard for this (https://gatk.broadinstitute.org/hc/en-us).
 
 ```
+wget https://molgenis26.target.rug.nl/downloads/gonl_public/variants/release5/gonl.chr1.snps_indels.r5.vcf.gz;
+wget https://molgenis26.target.rug.nl/downloads/gonl_public/variants/release5/gonl.chr2.snps_indels.r5.vcf.gz;
+wget https://molgenis26.target.rug.nl/downloads/gonl_public/variants/release5/gonl.chr3.snps_indels.r5.vcf.gz;
+wget https://molgenis26.target.rug.nl/downloads/gonl_public/variants/release5/gonl.chr4.snps_indels.r5.vcf.gz;
+wget https://molgenis26.target.rug.nl/downloads/gonl_public/variants/release5/gonl.chr5.snps_indels.r5.vcf.gz;
+wget https://molgenis26.target.rug.nl/downloads/gonl_public/variants/release5/gonl.chr6.snps_indels.r5.vcf.gz;
+wget https://molgenis26.target.rug.nl/downloads/gonl_public/variants/release5/gonl.chr7.snps_indels.r5.vcf.gz;
+wget https://molgenis26.target.rug.nl/downloads/gonl_public/variants/release5/gonl.chr8.snps_indels.r5.vcf.gz;
+wget https://molgenis26.target.rug.nl/downloads/gonl_public/variants/release5/gonl.chr9.snps_indels.r5.vcf.gz;
+wget https://molgenis26.target.rug.nl/downloads/gonl_public/variants/release5/gonl.chr10.snps_indels.r5.vcf.gz;
+wget https://molgenis26.target.rug.nl/downloads/gonl_public/variants/release5/gonl.chr11.snps_indels.r5.vcf.gz;
+wget https://molgenis26.target.rug.nl/downloads/gonl_public/variants/release5/gonl.chr12.snps_indels.r5.vcf.gz;
+wget https://molgenis26.target.rug.nl/downloads/gonl_public/variants/release5/gonl.chr13.snps_indels.r5.vcf.gz;
+wget https://molgenis26.target.rug.nl/downloads/gonl_public/variants/release5/gonl.chr14.snps_indels.r5.vcf.gz;
+wget https://molgenis26.target.rug.nl/downloads/gonl_public/variants/release5/gonl.chr15.snps_indels.r5.vcf.gz;
+wget https://molgenis26.target.rug.nl/downloads/gonl_public/variants/release5/gonl.chr16.snps_indels.r5.vcf.gz;
+wget https://molgenis26.target.rug.nl/downloads/gonl_public/variants/release5/gonl.chr17.snps_indels.r5.vcf.gz;
+wget https://molgenis26.target.rug.nl/downloads/gonl_public/variants/release5/gonl.chr18.snps_indels.r5.vcf.gz;
+wget https://molgenis26.target.rug.nl/downloads/gonl_public/variants/release5/gonl.chr19.snps_indels.r5.vcf.gz;
+wget https://molgenis26.target.rug.nl/downloads/gonl_public/variants/release5/gonl.chr20.snps_indels.r5.vcf.gz;
+wget https://molgenis26.target.rug.nl/downloads/gonl_public/variants/release5/gonl.chr21.snps_indels.r5.vcf.gz;
+wget https://molgenis26.target.rug.nl/downloads/gonl_public/variants/release5/gonl.chr22.snps_indels.r5.vcf.gz;
+
 java -jar picard.jar SortVcf \
       I=gonl.chr1.snps_indels.r5.vcf.gz \
       I=gonl.chr2.snps_indels.r5.vcf.gz \
