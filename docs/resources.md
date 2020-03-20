@@ -1,5 +1,3 @@
-# !!Stil under construction!!
-
 # Get & configure resources (per genome)
 
 ## Steps
@@ -101,21 +99,21 @@ Adapt the configs/resources.config file to include the resources you just gather
 ```
 params {
  resource_dir = '/full/path/to/resources/dir/'
- genomes {
-  'GRCh37' {
-      fasta = '${params.resource_dir}/GRCh37/Sequence/genome.fa'
+  genomes {
+    "GRCh37" {
+      fasta = "${params.resource_dir}/GRCh37/Sequence/genome.fa"
       gatk_known_sites = [
-       '${params.resource_dir}/GRCh37/Annotation/1000G_phase1.indels.b37.vcf',
-       '${params.resource_dir}/GRCh37/Annotation/dbsnp_137.b37.vcf',
-       '${params.resource_dir}/GRCh37/Annotation/Mills_and_1000G_gold_standard.indels.b37.vcf'
+        "${params.resource_dir}/GRCh37/Annotation/1000G_phase1.indels.b37.vcf",
+        "${params.resource_dir}/GRCh37/Annotation/dbsnp_137.b37.vcf",
+        "${params.resource_dir}/GRCh37/Annotation/Mills_and_1000G_gold_standard.indels.b37.vcf"
       ]
-      dbsnp = '${params.resource_dir}/GRCh37/Annotation/dbsnp_137.b37.vcf'
-      dbnsfp = '${params.resource_dir}/GRCh37/Annotation/dbNSFP2.9.3_variant.txt.gz'
-      cosmic = '${params.resource_dir}/GRCh37/Annotation/CosmicCodingMuts_v76.vcf.gz'
-      gonl = '${params.resource_dir}/GRCh37/Annotation/gonl.snps_indels.r5.sorted.vcf'
-      interval_list = '${params.resource_dir}/GRCh37/Sequence/genome.interval_list'
+      dbsnp = "${params.resource_dir}/GRCh37/Annotation/dbsnp_137.b37.vcf"
+      dbnsfp = "${params.resource_dir}/GRCh37/Annotation/dbNSFP2.9.3_variant.txt.gz"
+      cosmic = "${params.resource_dir}/GRCh37/Annotation/CosmicCodingMuts_v76.vcf.gz"
+      gonl = "${params.resource_dir}/GRCh37/Annotation/gonl.snps_indels.r5.sorted.vcf"
+      interval_list = "${params.resource_dir}/GRCh37/Sequence/genome.interval_list"
+    }
   }
- }
 }
 
 ```
