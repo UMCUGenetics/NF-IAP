@@ -96,23 +96,24 @@ awk '{ print $1"\t1\t"$2"\t+\t."}' genome.fa.fai | cat genome.dict - > genome.in
 Copy the  genome.interval_list to /nf-iap/resources/GRCh37/Sequence/.
 
 ### 7 Create resources config
-Adapt the configs/resources.config file to include the resources you just gathered. An example for human genome build GRCh37 using the files generated in step 1-6:
+Adapt the configs/resources.config file to include the resources you just gathered. Also don't forget to set the resource_dir. An example for human genome build GRCh37 using the files generated in step 1-6:
 
 ```
 params {
+ resource_dir = '/full/path/to/resources/dir/'
  genomes {
   'GRCh37' {
-      fasta = '/nf-iap/resources/GRCh37/Sequence/genome.fa'
+      fasta = '${params.resource_dir}/GRCh37/Sequence/genome.fa'
       gatk_known_sites = [
-       '/nf-iap/resources/GRCh37/Annotation/1000G_phase1.indels.b37.vcf',
-       '/nf-iap/resources/GRCh37/Annotation/dbsnp_137.b37.vcf',
-       '/nf-iap/resources/GRCh37/Annotation/Mills_and_1000G_gold_standard.indels.b37.vcf'
+       '${params.resource_dir}/GRCh37/Annotation/1000G_phase1.indels.b37.vcf',
+       '${params.resource_dir}/GRCh37/Annotation/dbsnp_137.b37.vcf',
+       '${params.resource_dir}/GRCh37/Annotation/Mills_and_1000G_gold_standard.indels.b37.vcf'
       ]
-      dbsnp = '/nf-iap/resources/GRCh37/Annotation/dbsnp_137.b37.vcf'
-      dbnsfp = '/nf-iap/resources/GRCh37/Annotation/dbNSFP2.9.3_variant.txt.gz'
-      cosmic = '/nf-iap/resources/GRCh37/Annotation/CosmicCodingMuts_v76.vcf.gz'
-      gonl = '/nf-iap/resources/GRCh37/Annotation/gonl.snps_indels.r5.sorted.vcf'
-      interval_list = '/nf-iap/resources/GRCh37/Sequence/genome.interval_list'
+      dbsnp = '${params.resource_dir}/GRCh37/Annotation/dbsnp_137.b37.vcf'
+      dbnsfp = '${params.resource_dir}/GRCh37/Annotation/dbNSFP2.9.3_variant.txt.gz'
+      cosmic = '${params.resource_dir}/GRCh37/Annotation/CosmicCodingMuts_v76.vcf.gz'
+      gonl = '${params.resource_dir}/GRCh37/Annotation/gonl.snps_indels.r5.sorted.vcf'
+      interval_list = '${params.resource_dir}/GRCh37/Sequence/genome.interval_list'
   }
  }
 }
