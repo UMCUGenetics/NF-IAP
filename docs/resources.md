@@ -30,11 +30,14 @@ scp -R /Homo_sapiens/Ensembl/GRCh37/Sequence/WholeGenomeFasta/* /nf-iap/resource
 Download the following files from the GATK bundle for your specific build (in this case GRCh37) :
 ```
 wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/b37/1000G_phase1.indels.b37.vcf.gz
+wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/b37/1000G_phase1.indels.b37.vcf.gz.tbi
 wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/b37/dbsnp_138.b37.vcf.gz
+wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/b37/dbsnp_138.b37.vcf.gz.tbi
 wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/b37/Mills_and_1000G_gold_standard.indels.b37.vcf.gz
+wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/b37/Mills_and_1000G_gold_standard.indels.b37.vcf.gz.tbi
 ```
 
-Unzip all files and copy them to a sensible resources directory. We re-used the directory created in the previous step and copies all files to: /nf-iap/resources/GRCh37/Annotation/
+Copy them to a sensible resources directory. We re-used the directory created in the previous step and copies all files to: /nf-iap/resources/GRCh37/Annotation/
 ### 3 Set up dbNSFP database
 Download the dbNSFP database for your specific build (in this case GRCh37):
 ```
