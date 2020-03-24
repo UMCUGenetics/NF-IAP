@@ -45,7 +45,9 @@ wget ftp://dbnsfp:dbnsfp@dbnsfp.softgenetics.com/dbNSFPv2.9.3.zip
 ```
 Combine all files and copy the result file to a sensible resources directory. Again we re-used the directory created in step 1 and copied the file to: /nf-iap/resources/GRCh37/Annotation/
 ```
-cat dbNSFP2.9.3_variant.chr* | grep -v "^#" | cat header.txt - | gzip > dbNSFP2.9.3_variant.txt.gz
+(head -n 1 dbNSFP2.9.3_variant.chr1 ; cat dbNSFP2.9.3_variant.chr* | grep -v "^#" ) > dbNSFP2.9.3.txt
+bgzip dbNSFP2.9.3.txt
+tabix -s 1 -b 2 -e 2 dbNSFP2.9.3.txt.gz
 ```
 
 
