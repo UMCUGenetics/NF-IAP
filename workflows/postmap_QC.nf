@@ -1,6 +1,5 @@
-include CollectMultipleMetrics from '../NextflowModules/GATK/4.1.3.0/CollectMultipleMetrics.nf' params(params)
-include CollectWGSMetrics from '../NextflowModules/GATK/4.1.3.0/CollectWGSMetrics.nf' params(params)
-include MultiQC from '../NextflowModules/MultiQC/1.5/MultiQC.nf' params(params)
+include CollectMultipleMetrics from '../NextflowModules/GATK/4.1.3.0/CollectMultipleMetrics.nf' params(optional: '--PROGRAM CollectAlignmentSummaryMetrics --PROGRAM CollectInsertSizeMetrics --PROGRAM QualityScoreDistribution --PROGRAM MeanQualityByCycle --PROGRAM CollectBaseDistributionByCycle --PROGRAM CollectGcBiasMetrics --PROGRAM CollectSequencingArtifactMetrics --PROGRAM CollectQualityYieldMetrics', mem: "${params.collectmultiplemetrics.mem}", genome_fasta:"${params.genome_fasta}")
+include CollectWGSMetrics from '../NextflowModules/GATK/4.1.3.0/CollectWGSMetrics.nf' params(optional: '', mem: "${params.collectwgsmetrics.mem}", genome_fasta:"${params.genome_fasta}")
 
 workflow postmap_QC {
   take:

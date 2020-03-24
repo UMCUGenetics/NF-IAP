@@ -1,8 +1,8 @@
-include HaplotypeCaller from '../NextflowModules/GATK/4.1.3.0/HaplotypeCaller.nf' params(params)
-include CombineGVCFs from '../NextflowModules/GATK/4.1.3.0/CombineGVCFs.nf' params(params)
-include MergeVCFs as MergeGVCF from '../NextflowModules/GATK/4.1.3.0/MergeVCFs.nf' params(params)
-include GenotypeGVCFs from '../NextflowModules/GATK/4.1.3.0/GenotypeGVCFs.nf' params(params)
-include SplitIntervals from '../NextflowModules/GATK/4.1.3.0/SplitIntervals.nf' params(params)
+include HaplotypeCaller from '../NextflowModules/GATK/4.1.3.0/HaplotypeCaller.nf' params(optional:'-ERC GVCF', mem: "${params.haplotypecaller.mem}", genome_fasta : "${params.genome_fasta}")
+include CombineGVCFs from '../NextflowModules/GATK/4.1.3.0/CombineGVCFs.nf' params(mem: "${params.combinegvcfs.mem}", genome_fasta: "${params.genome_fasta}")
+include MergeVCFs as MergeGVCF from '../NextflowModules/GATK/4.1.3.0/MergeVCFs.nf' params(mem: "${params.mergevcf.mem}")
+include GenotypeGVCFs from '../NextflowModules/GATK/4.1.3.0/GenotypeGVCFs.nf' params(mem: "${params.genotypegvcfs.mem}", genome_fasta: "${params.genome_fasta}", genome_dbsnp: "${params.genome_dbsnp}")
+include SplitIntervals from '../NextflowModules/GATK/4.1.3.0/SplitIntervals.nf' params(optional: '--SCATTER_COUNT 1000 --UNIQUE true -M BALANCING_WITHOUT_INTERVAL_SUBDIVISION_WITH_OVERFLOW')
 
 workflow gatk_germline_calling {
   take:

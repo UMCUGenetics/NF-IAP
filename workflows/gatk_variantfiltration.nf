@@ -1,6 +1,6 @@
-include SelectVariants from '../NextflowModules/GATK/4.1.3.0/SelectVariants.nf' params(params)
-include VariantFiltration from '../NextflowModules/GATK/4.1.3.0/VariantFiltration.nf' params(params)
-include MergeVCFs as MergeVCF from '../NextflowModules/GATK/4.1.3.0/MergeVCFs.nf' params(params)
+include SelectVariants from '../NextflowModules/GATK/4.1.3.0/SelectVariants.nf' params(optional: '',mem: "${params.selectvariants.mem}", genome_fasta: "${params.genome_fasta}")
+include VariantFiltration from '../NextflowModules/GATK/4.1.3.0/VariantFiltration.nf' params(optional: '',mem: "${params.variantfiltration.mem}", genome_fasta: "${params.genome_fasta}")
+include MergeVCFs as MergeVCF from '../NextflowModules/GATK/4.1.3.0/MergeVCFs.nf' params(optional: '',mem: "${params.mergevcf.mem}")
 
 workflow gatk_variantfiltration {
   take:

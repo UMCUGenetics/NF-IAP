@@ -2,6 +2,37 @@
 
 nextflow.preview.dsl=2
 
+/*  Check if all necessary input parameters are present */
+if ( (!params.fastq_path && !params.bam_path && !params.gvcf_path ) && !params.vcf_path){
+  exit 1, "Please provide either a 'fastq_path', 'bam_path', 'gvcf_path' or 'vcf_path'. You can provide these parameters either in the <analysis_name>.config file or on the commandline (add -- in front of the parameter)."
+}
+
+if (!params.out_dir){
+  exit 1, "No 'out_dir' parameter found in <analysis_name>.config file or on the commandline (add -- in front of the parameter)."
+}
+
+if (!params.genome){
+  exit 1, "No 'genome' parameter found in in <analysis_name>.config file or on the commandline (add -- in front of the parameter)."
+}
+if ( !params.genomes[params.genome] || !params.genomes[params.genome].fasta ){
+  exit 1, "'genome' parameter ${params.genome} not found in list of genomes in resources.config!"
+}
+
+if ( !params.genomes[params.genome].interval_list ){
+  exit 1, "No interval_list found for ${params.genome}!"
+}
+
+workDir = params.out_dir
+
+params.genome_fasta = params.genomes[params.genome].fasta
+params.scatter_interval_list = params.genomes[params.genome].interval_list
+params.genome_known_sites = params.genomes[params.genome].gatk_known_sites ? params.genomes[params.genome].gatk_known_sites : null
+params.genome_dbsnp = params.genomes[params.genome].dbsnp ? params.genomes[params.genome].dbsnp : null
+params.genome_dbnsfp = params.genomes[params.genome].dbnsfp ? params.genomes[params.genome].dbnsfp : null
+params.genome_variant_annotator_db = params.genomes[params.genome].cosmic ? params.genomes[params.genome].cosmic : null
+params.genome_snpsift_annotate_db = params.genomes[params.genome].gonl ? params.genomes[params.genome].gonl : null
+
+
 include './NextflowModules/Utils/fastq.nf'
 include extractBamFromDir from './NextflowModules/Utils/bam.nf'
 include extractGVCFFromDir from './NextflowModules/Utils/gvcf.nf'
@@ -15,16 +46,7 @@ include gatk_germline_calling from './workflows/gatk_germline_calling.nf' params
 include gatk_variantfiltration from './workflows/gatk_variantfiltration.nf' params(params)
 include snpeff_gatk_annotate from './workflows/snpeff_gatk_annotate.nf' params(params)
 
-/*  Check if all necessary input parameters are present */
-if ( (!params.fastq_path && !params.bam_path && !params.gvcf_path ) && !params.vcf_path){
-  exit 1, "Please provide either a 'fastq_path', 'bam_path', 'gvcf_path' or 'vcf_path'. You can provide these parameters either in the <analysis_name>.config file or on the commandline (add -- in front of the parameter)."
-}
 
-if (!params.out_dir){
-  exit 1, "No 'out_dir' parameter found in <analysis_name>.config file or on the commandline (add -- in front of the parameter)."
-}
-
-workDir = params.out_dir
 
 workflow {
   main :
@@ -66,8 +88,8 @@ workflow {
     // Optionally run post mapping QC
     if (params.postmapQC && input_bams) { postmap_QC( input_bams )}
 
-    // Depending on whether input_bams and/or input_gvcf were provide start from gatk_bqsr or directly from gatk_germline_calling.
-    // gatk_germline_calling supports both bam and/or gvcf input (one of the channels can be empty)
+    // // Depending on whether input_bams and/or input_gvcf were provide start from gatk_bqsr or directly from gatk_germline_calling.
+    // // gatk_germline_calling supports both bam and/or gvcf input (one of the channels can be empty)
     if (params.germlineCalling){
       if (input_bams && input_gvcf){
         gatk_bqsr( input_bams )
@@ -79,7 +101,7 @@ workflow {
         gatk_germline_calling(Channel.empty(), input_gvcf)
       }
     }
-
+    
     //Run variant filtration on generated vcfs or input vcfs
     if (params.variantFiltration){
       if( gatk_germline_calling.out ){
@@ -104,7 +126,10 @@ workflow {
 
     // Run summary_QC only when both pre- and post-mapping QC are finished.
     if (params.premapQC && params.postmapQC && input_fastqs && input_bams){
-      summary_QC( premap_QC.out.mix(postmap_QC.out[0]).collect() )
+      summary_QC( premap_QC.out
+        .mix(postmap_QC.out[0]).collect()
+        .mix(postmap_QC.out[1]).collect()
+      )
     }else if (params.premapQC && input_fastqs){
       summary_QC(premap_QC.out.collect())
     }else if (params.postmapQC  && input_bams){
