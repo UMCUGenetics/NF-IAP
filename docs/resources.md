@@ -23,18 +23,18 @@ tar -xzvf Homo_sapiens_Ensembl_GRCh37.tar.gz
 Copy the files in the /Homo_sapiens/Ensembl/GRCh37/Sequence/WholeGenomeFasta/* directory to a resources directory:
 
 ```
-scp -R /Homo_sapiens/Ensembl/GRCh37/Sequence/WholeGenomeFasta/* /nf-iap/resources/GRCh37/Sequence
+cp -R /Homo_sapiens/Ensembl/GRCh37/Sequence/WholeGenomeFasta/* /nf-iap/resources/GRCh37/Sequence
 ```
 
 ### 2 Set up GATK bundle
 Download the following files from the GATK bundle for your specific build (in this case GRCh37) :
 ```
 wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/b37/1000G_phase1.indels.b37.vcf.gz
-wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/b37/1000G_phase1.indels.b37.vcf.gz.tbi
+wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/b37/1000G_phase1.indels.b37.vcf.idx.gz
 wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/b37/dbsnp_138.b37.vcf.gz
-wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/b37/dbsnp_138.b37.vcf.gz.tbi
+wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/b37/dbsnp_138.b37.vcf.idx.gz
 wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/b37/Mills_and_1000G_gold_standard.indels.b37.vcf.gz
-wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/b37/Mills_and_1000G_gold_standard.indels.b37.vcf.gz.tbi
+wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/b37/Mills_and_1000G_gold_standard.indels.b37.vcf.idx.gz
 ```
 
 Copy them to a sensible resources directory. We re-used the directory created in the previous step and copies all files to: /nf-iap/resources/GRCh37/Annotation/
@@ -42,6 +42,7 @@ Copy them to a sensible resources directory. We re-used the directory created in
 Download the dbNSFP database for your specific build (in this case GRCh37):
 ```
 wget ftp://dbnsfp:dbnsfp@dbnsfp.softgenetics.com/dbNSFPv2.9.3.zip
+unzip dbNSFPv2.9.3.zip
 ```
 Combine all files and copy the result file to a sensible resources directory. Again we re-used the directory created in step 1 and copied the file to: /nf-iap/resources/GRCh37/Annotation/
 ```
@@ -82,11 +83,12 @@ wget https://molgenis26.target.rug.nl/downloads/gonl_public/variants/release5/go
 wget https://molgenis26.target.rug.nl/downloads/gonl_public/variants/release5/gonl.chr21.snps_indels.r5.vcf.gz;
 wget https://molgenis26.target.rug.nl/downloads/gonl_public/variants/release5/gonl.chr22.snps_indels.r5.vcf.gz;
 
-java -jar picard.jar SortVcf \
+java -Xmx4g -jar picard.jar -Djava.io.tmpdir=`pwd`/tmp SortVcf \
       I=gonl.chr1.snps_indels.r5.vcf.gz \
       I=gonl.chr2.snps_indels.r5.vcf.gz \
       I=etc.vcf
       O=gonl.snps_indels.r5.sorted.vcf
+      TMP_DIR=`pwd`/tmp
 gzip gonl.snps_indels.r5.sorted.vcf
 ```
 Copy the gonl.snps_indels.r5.sorted.vcf.gz file to /nf-iap/resources/GRCh37/Annotation/.
