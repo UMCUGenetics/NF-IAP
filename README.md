@@ -6,10 +6,10 @@ Nextflow Illumina Analysis Pipeline. Includes pre/post-mapping QC, BWA mapping &
 
 1. [Install Nextflow](https://www.nextflow.io/docs/latest/getstarted.html#installation)
 2. [Install Singularity](https://sylabs.io/guides/3.5/admin-guide/)
-2. [Pull/Clone NF-IAP](#pull-or-clone)
-3. [Get & configure resources](docs/resources.md)
-4. [Configure nextflow](docs/nextflow.md)
-5. [Configure processes](docs/processes.md)
+3. [Pull/Clone NF-IAP](#pull-or-clone)
+4. [Get & configure resources](docs/resources.md)
+5. [Configure nextflow](docs/nextflow.md)
+6. [Configure processes](docs/processes.md)
 
 ## Pull or Clone 
 Be sure to add the --recursive option to also included the neccessary modules.
