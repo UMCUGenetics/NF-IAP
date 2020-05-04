@@ -31,7 +31,9 @@ params.genome_dbsnp = params.genomes[params.genome].dbsnp ? params.genomes[param
 params.genome_dbnsfp = params.genomes[params.genome].dbnsfp ? params.genomes[params.genome].dbnsfp : null
 params.genome_variant_annotator_db = params.genomes[params.genome].cosmic ? params.genomes[params.genome].cosmic : null
 params.genome_snpsift_annotate_db = params.genomes[params.genome].gonl ? params.genomes[params.genome].gonl : null
-
+params.genome_freec_chr_len = params.genomes[params.genome].freec_chr_len ? params.genomes[params.genome].freec_chr_len : null
+params.genome_freec_chr_files = params.genomes[params.genome].freec_chr_files ? params.genomes[params.genome].freec_chr_files : null
+params.genome_freec_mappability = params.genomes[params.genome].freec_mappability ? params.genomes[params.genome].freec_mappability : null
 
 include './NextflowModules/Utils/fastq.nf'
 include extractBamFromDir from './NextflowModules/Utils/bam.nf'
@@ -45,8 +47,8 @@ include gatk_bqsr from './workflows/gatk_bqsr.nf' params(params)
 include gatk_germline_calling from './workflows/gatk_germline_calling.nf' params(params)
 include gatk_variantfiltration from './workflows/gatk_variantfiltration.nf' params(params)
 include snpeff_gatk_annotate from './workflows/snpeff_gatk_annotate.nf' params(params)
-
-
+include sv_calling from './workflows/sv_calling.nf' params(params)
+include cnv_calling from './workflows/cnv_calling.nf' params(params)
 
 workflow {
   main :
@@ -101,7 +103,7 @@ workflow {
         gatk_germline_calling(Channel.empty(), input_gvcf)
       }
     }
-    
+
     //Run variant filtration on generated vcfs or input vcfs
     if (params.variantFiltration){
       if( gatk_germline_calling.out ){
@@ -136,4 +138,13 @@ workflow {
       summary_QC(postmap_QC.out[0].collect())
     }
 
+    // Run sv calling only when either bam-files or fastq files were provided as input and svCalling is true
+    if (params.svCalling && input_bams ){
+      sv_calling(input_bams)
+    }
+
+    // Run cnv calling only when either bam-files or fastq files were provided as input and cnvCalling is true
+    if (params.cnvCalling && input_bams){
+      cnv_calling(input_bams)
+    }
 }
