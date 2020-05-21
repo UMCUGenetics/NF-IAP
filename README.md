@@ -25,9 +25,9 @@ In this section we'll provide you with a few different ways to run the workflow.
 
 Always keep these lines in your run.config file:
 ```
-includeConfig 'nextflow.config'
-includeConfig 'process.config'
-includeConfig 'resources.config'
+includeConfig '/path/to/config/nextflow.config'
+includeConfig '/path/to/config/process.config'
+includeConfig '/path/to/config/resources.config'
 ```
 All of the parameters in the params section can also be supplied on the commandline or can be pre-filled in the run.config file.
 ```
