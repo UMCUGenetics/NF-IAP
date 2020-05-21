@@ -47,8 +47,8 @@ include gatk_bqsr from './workflows/gatk_bqsr.nf' params(params)
 include gatk_germline_calling from './workflows/gatk_germline_calling.nf' params(params)
 include gatk_variantfiltration from './workflows/gatk_variantfiltration.nf' params(params)
 include snpeff_gatk_annotate from './workflows/snpeff_gatk_annotate.nf' params(params)
-include sv_calling from './workflows/sv_calling.nf' params(params)
-include cnv_calling from './workflows/cnv_calling.nf' params(params)
+// include sv_calling from './workflows/sv_calling.nf' params(params)
+// include cnv_calling from './workflows/cnv_calling.nf' params(params)
 
 workflow {
   main :
@@ -138,13 +138,13 @@ workflow {
       summary_QC(postmap_QC.out[0].collect())
     }
 
-    // Run sv calling only when either bam-files or fastq files were provided as input and svCalling is true
-    if (params.svCalling && input_bams ){
-      sv_calling(input_bams)
-    }
-
-    // Run cnv calling only when either bam-files or fastq files were provided as input and cnvCalling is true
-    if (params.cnvCalling && input_bams){
-      cnv_calling(input_bams)
-    }
+    // // Run sv calling only when either bam-files or fastq files were provided as input and svCalling is true
+    // if (params.svCalling && input_bams ){
+    //   sv_calling(input_bams)
+    // }
+    //
+    // // Run cnv calling only when either bam-files or fastq files were provided as input and cnvCalling is true
+    // if (params.cnvCalling && input_bams){
+    //   cnv_calling(input_bams)
+    // }
 }
