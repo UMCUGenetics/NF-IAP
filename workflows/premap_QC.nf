@@ -1,4 +1,4 @@
-include FastQC from '../NextflowModules/FastQC/0.11.5/FastQC' params(optional : '--noextract', mem: "${params.fastqc.mem}")
+include FastQC from '../NextflowModules/FastQC/0.11.5/FastQC' params(optional : "${params.fastqc.optional}", mem: "${params.fastqc.mem}")
 
 workflow premap_QC {
   take:

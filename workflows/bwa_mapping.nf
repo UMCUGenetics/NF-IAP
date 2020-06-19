@@ -1,6 +1,6 @@
-include BWAMapping from '../NextflowModules/BWA-Mapping/bwa-0.7.17_samtools-1.9/Mapping.nf' params(optional: '-M -c 100', mem: "${params.bwa.mem}", genome_fasta : "${params.genome_fasta}")
-include Index from '../NextflowModules/BWA/0.7.17/Index.nf' params(optional: '-a bwtsw', genome_fasta : "${params.genome_fasta}")
-include MarkDup from '../NextflowModules/Sambamba/0.6.8/MarkDup.nf' params(optional: '--overflow-list-size=2000000', mem: "${params.markdup.mem}")
+include BWAMapping from '../NextflowModules/BWA-Mapping/bwa-0.7.17_samtools-1.9/Mapping.nf' params(optional: "${params.bwa.optional}", mem: "${params.bwa.mem}", genome_fasta : "${params.genome_fasta}")
+include Index from '../NextflowModules/BWA/0.7.17/Index.nf' params(optional: "${params.bwaindex.optional}", genome_fasta : "${params.genome_fasta}")
+include MarkDup from '../NextflowModules/Sambamba/0.6.8/MarkDup.nf' params(optional: "${params.markdup.optional}", mem: "${params.markdup.mem}")
 
 workflow bwa_mapping {
   take:

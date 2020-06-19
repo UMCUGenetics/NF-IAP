@@ -1,10 +1,30 @@
-include ControlFreec from '../NextflowModules/Control-FREEC/v11.5/ControlFreec.nf' params(optional: "ploidy=2\nwindow=1000\ntelocentromeric=50000\nBedGraphOutput=TRUE\n",mem: "${params.controlfreec.mem}",freec_path:'/hpc/local/CentOS7/cog_bioinf/freec_v11.0',sambamba_path:'/hpc/local/CentOS7/cog_bioinf/sambamba_v0.7.0/sambamba',samtools_path:'/hpc/local/CentOS7/cog_bioinf/samtools-1.9/samtools',genome_freec_chr_len: "${params.genome_freec_chr_len}",genome_freec_chr_files: "${params.genome_freec_chr_files}",genome_freec_mappability: "${params.genome_freec_mappability}")
+include Freec from '../NextflowModules/ControlFREEC/11.5/Freec.nf' params(
+  mem: "${params.freec.mem}",
+  chr_len_file: "${params.genome_freec_chr_len}",
+  chr_files: "${params.genome_freec_chr_files}",
+  gem_mappability_file: "${params.genome_freec_mappability}",
+  ploidy: "${params.freec_ploidy}",
+  window : "${params.freec_window}",
+  telocentromeric : "${params.freec_telocentromeric}"
+)
+include AssessSignificance from '../NextflowModules/ControlFREEC/11.5/AssessSignificance.nf' params()
+include MakeGraph from '../NextflowModules/ControlFREEC/11.5/MakeGraph.nf' params(ploidy: "${params.freec_ploidy}")
+include MakeKaryotype from '../NextflowModules/ControlFREEC/11.5/MakeKaryotype.nf' params(ploidy: "${params.freec_ploidy}",telocentromeric : "${params.freec_telocentromeric}", maxlevel: "${params.freec_maxlevel}")
+
 
 workflow cnv_calling {
   take :
     sample_bams
   main:
-    ControlFreec(sample_bams)
+    Freec(sample_bams)
+    AssessSignificance(Freec.out.cnv)
+    MakeGraph(Freec.out.cnv)
+    MakeKaryotype(Freec.out.cnv)
+
   emit:
-    ControlFreec.out
+    Freec.out.cnv
+    Freec.out.other
+    AssessSignificance.out
+    MakeGraph.out
+    MakeKaryotype.out
 }
