@@ -176,26 +176,26 @@ workflow {
         snpeff_gatk_annotate(input_vcf)
       }
     }
-
-    if (params.splitVCF && !params.vcf_path){
-      if (input_bams && input_gvcf){
-        input_bams.mix(input_gvcf).map{
-          sample_id, file,idx -> sample_id
-        }
-        .unique()
-        .view()
-      }else if(input_bams){
-        input_bams.map{
-          sample_id, file,idx -> sample_id
-        }
-        .view()
-      }else if(input_gvcf){
-        input_gvcf.map{
-          sample_id, file,idx -> sample_id
-        }
-        .view()
-      }
-    }
+    //Test code
+    // if (params.splitVCF && !params.vcf_path){
+    //   if (input_bams && input_gvcf){
+    //     input_bams.mix(input_gvcf).map{
+    //       sample_id, file,idx -> sample_id
+    //     }
+    //     .unique()
+    //     .view()
+    //   }else if(input_bams){
+    //     input_bams.map{
+    //       sample_id, file,idx -> sample_id
+    //     }
+    //     .view()
+    //   }else if(input_gvcf){
+    //     input_gvcf.map{
+    //       sample_id, file,idx -> sample_id
+    //     }
+    //     .view()
+    //   }
+    // }
 
 
     // Run summary_QC only when both pre- and post-mapping QC are finished.
