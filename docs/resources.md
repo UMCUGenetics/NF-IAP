@@ -37,7 +37,13 @@ wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/b37/Mills_and_1000G
 wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/b37/Mills_and_1000G_gold_standard.indels.b37.vcf.idx.gz
 ```
 
-Copy them to a sensible resources directory. We re-used the directory created in the previous step and copies all files to: /nf-iap/resources/GRCh37/Annotation/
+Copy them to a sensible resources directory. We re-used the directory created in the previous step and copies all files to: /nf-iap/resources/GRCh37/Annotation/. Now unzip all the files and re-zip + index them using the following commands:
+```
+gunzip <filename>.vcf.gz
+bgzip <filename>.vcf   
+tabix <filename>.vcf.gz
+```
+
 ### 3 Set up dbNSFP database
 Download the dbNSFP database for your specific build (in this case GRCh37):
 ```

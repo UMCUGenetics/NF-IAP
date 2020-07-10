@@ -2,7 +2,7 @@ include BaseRecalibrationTable from '../NextflowModules/GATK/4.1.3.0/BaseRecalib
 include BaseRecalibration from '../NextflowModules/GATK/4.1.3.0/BaseRecalibration.nf' params(mem: "${params.applybqsr.mem}", genome_fasta: "${params.genome_fasta}")
 include GatherBaseRecalibrationTables from '../NextflowModules/GATK/4.1.3.0/GatherBaseRecalibrationTables.nf' params(mem: "${params.gatherbaserecalibrator.mem}")
 include MergeBams from '../NextflowModules/Sambamba/0.6.8/MergeBams.nf' params(mem: "${params.mergebams.mem}")
-include SplitIntervals from '../NextflowModules/GATK/4.1.3.0/SplitIntervals.nf' params(optional: '--SCATTER_COUNT 1000 --UNIQUE true -M BALANCING_WITHOUT_INTERVAL_SUBDIVISION_WITH_OVERFLOW')
+include SplitIntervals from '../NextflowModules/GATK/4.1.3.0/SplitIntervals.nf' params(optional: "${params.splitintervals.optional}")
 
 workflow gatk_bqsr {
   take:
@@ -10,7 +10,7 @@ workflow gatk_bqsr {
 
   main:
     // Create intervals to scatter/gather over
-    SplitIntervals( 'no-break', Channel.fromPath( params.scatter_interval_list) )
+    SplitIntervals( 'no-break', Channel.fromPath( params.genome_interval_list) )
 
     // Create base recalibration table per interval per sample
     BaseRecalibrationTable( sample_bams.combine(SplitIntervals.out.flatten()) )

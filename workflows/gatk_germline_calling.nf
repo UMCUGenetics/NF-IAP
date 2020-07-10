@@ -1,8 +1,8 @@
-include HaplotypeCaller from '../NextflowModules/GATK/4.1.3.0/HaplotypeCaller.nf' params(optional:'-ERC GVCF', mem: "${params.haplotypecaller.mem}", genome_fasta : "${params.genome_fasta}")
+include HaplotypeCaller from '../NextflowModules/GATK/4.1.3.0/HaplotypeCaller.nf' params(optional:"${params.haplotypecaller.optional}", mem: "${params.haplotypecaller.mem}", genome_fasta : "${params.genome_fasta}")
 include CombineGVCFs from '../NextflowModules/GATK/4.1.3.0/CombineGVCFs.nf' params(mem: "${params.combinegvcfs.mem}", genome_fasta: "${params.genome_fasta}")
 include MergeVCFs as MergeGVCF from '../NextflowModules/GATK/4.1.3.0/MergeVCFs.nf' params(mem: "${params.mergevcf.mem}")
 include GenotypeGVCFs from '../NextflowModules/GATK/4.1.3.0/GenotypeGVCFs.nf' params(mem: "${params.genotypegvcfs.mem}", genome_fasta: "${params.genome_fasta}", genome_dbsnp: "${params.genome_dbsnp}")
-include SplitIntervals from '../NextflowModules/GATK/4.1.3.0/SplitIntervals.nf' params(optional: '--SCATTER_COUNT 1000 --UNIQUE true -M BALANCING_WITHOUT_INTERVAL_SUBDIVISION_WITH_OVERFLOW')
+include SplitIntervals from '../NextflowModules/GATK/4.1.3.0/SplitIntervals.nf' params(optional: "${params.splitintervals.optional}")
 
 workflow gatk_germline_calling {
   take:
@@ -12,7 +12,7 @@ workflow gatk_germline_calling {
     run_id = params.out_dir.split('/')[-1]
 
     // Create intervals to scatter/gather over
-    SplitIntervals( 'break', Channel.fromPath(params.scatter_interval_list) )
+    SplitIntervals( 'break', Channel.fromPath(params.genome_interval_list) )
 
 
     if (sample_gvcfs && sample_bams){
