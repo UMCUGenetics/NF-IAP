@@ -8,7 +8,8 @@
 4. [Cosmic database (human only)](#4-set-up-cosmic-database)
 5. [GoNL database (human only)](#5-set-up-gonl-database)
 6. [Create genome interval list](#6-create-genome-interval-list)
-7. [Create resources config](#7-create-resources-config)
+7. [Create FREEC resource files (human only)](#7-create-freec-resource-files)
+8. [Create resources config](#8-create-resources-config)
 
 
 ### 1 Set up reference genome
@@ -106,7 +107,31 @@ awk '{ print $1"\t1\t"$2"\t+\t."}' genome.fa.fai | cat genome.dict - > genome.in
 ```
 Copy the  genome.interval_list to /nf-iap/resources/GRCh37/Sequence/.
 
-### 7 Create resources config
+### 7 Create FREEC resource files
+
+
+Create (or download) a genome.len file. For GRCh37 one is available at http://bioinfo-out.curie.fr/projects/freec/src/hg19.len.
+```
+wget http://bioinfo-out.curie.fr/projects/freec/src/hg19.len
+```
+
+Create a directory containing a .fa (fasta) file per chromosome. You can split up the original genome.fa. The human genome the chr_files directory looks like this:
+```
+chr_files
+      chr1.fa
+      chr10.fa
+      chr11.fa
+      etc
+```
+Download and unzip the freec_mappability file.
+```
+wget https://xfer.curie.fr/get/nil/7hZIk1C63h0/hg19_len100bp.tar.gz
+tar -xzvf https://xfer.curie.fr/get/nil/7hZIk1C63h0/hg19_len100bp.tar.gz
+```
+
+
+
+### 8 Create resources config
 Adapt the configs/resources.config file to include the resources you just gathered. Also don't forget to set the resource_dir. An example for human genome build GRCh37 using the files generated in step 1-6:
 
 ```
@@ -125,6 +150,9 @@ params {
       cosmic = "${params.resource_dir}/GRCh37/Annotation/CosmicCodingMuts_v76.vcf.gz"
       gonl = "${params.resource_dir}/GRCh37/Annotation/gonl.snps_indels.r5.sorted.vcf"
       interval_list = "${params.resource_dir}/GRCh37/Sequence/genome.interval_list"
+      freec_chr_len = "${params.resource_dir}/GRCh37/Sequence/genome.len"
+      freec_chr_files = "${params.resource_dir}/GRCh37/Sequence/chr_files"
+      freec_mappability = "${params.resource_dir}/GRCh37/Annotation/misc/out100m2_hg19.gem"
     }
   }
 }
