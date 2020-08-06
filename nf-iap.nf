@@ -85,8 +85,10 @@ workflow {
 
     // Gather input FastQ's
     if (params.fastq_path){
-      include extractFastqFromDir from './NextflowModules/Utils/fastq.nf'
-      input_fastqs = extractFastqFromDir(params.fastq_path)
+      include extractAllFastqFromDir from './NextflowModules/Utils/fastq.nf'
+      input_fastqs = extractAllFastqFromDir(params.fastq_path).map{
+        sample_id, rg_id, machine, run_nr,fastq_files -> [sample_id, rg_id,fastq_files]
+      }
     }
     // Gather input BAM files
     if (params.bam_path){
