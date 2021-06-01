@@ -172,9 +172,13 @@ workflow {
       params.genome_snpsift_annotate_db = params.genomes[params.genome].gonl
       include snpeff_gatk_annotate from './workflows/snpeff_gatk_annotate.nf' params(params)
 
-      if (gatk_variantfiltration.out){
-        snpeff_gatk_annotate(gatk_variantfiltration.out)
-      }else if(input_vcf){
+      if (params.variantFiltration){
+        if (gatk_variantfiltration.out){
+          snpeff_gatk_annotate(gatk_variantfiltration.out)
+        }else if(input_vcf){
+          snpeff_gatk_annotate(input_vcf)
+        }
+      }else if (input_vcf){
         snpeff_gatk_annotate(input_vcf)
       }
     }
