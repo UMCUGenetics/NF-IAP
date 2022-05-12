@@ -74,6 +74,20 @@ if (!params.genome){
   params.genome_interval_list = params.genomes[params.genome].interval_list
 }
 
+if ( params.runReport ) {
+  if (!params.report_template ) {
+      report_template = Channel
+        .fromPath( file("$baseDir/nf_iap_readme.md"), checkIfExists: true )
+        .ifEmpty { exit 1, "Default report template $baseDir/nf_iap_readme.md not found, and none specified! Please specify one with --report_template or disable report step"}
+  } else {
+    // Try importing.
+    report_template = Channel
+        .fromPath( params.report_template, checkIfExists: true )
+        .ifEmpty { exit 1, "Markdown report template not found: ${params.report_template}"}
+  } 
+}
+
+
 /*=================================
           Run workflow
 =================================*/
@@ -242,5 +256,11 @@ workflow {
       params.genome_freec_mappability = params.genomes[params.genome].freec_mappability
       include cnv_calling from './workflows/cnv_calling.nf' params(params)
       cnv_calling(input_bams)
+    }
+
+    //
+    if ( params.runReport ) {
+        include { generate_report } from './workflows/generate_report.nf' params(params)
+        generate_report ( "NF-IAP_report", report_template )
     }
 }
