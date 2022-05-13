@@ -3,7 +3,7 @@ include VariantFiltration from '../NextflowModules/GATK/4.1.3.0/VariantFiltratio
                                                                                                            genome_fasta: "${params.genome_fasta}", 
                                                                                                            gatk_snp_filter: "${params.gatk_snp_filter}", 
                                                                                                            gatk_indel_filter: "${params.gatk_indel_filter}", 
-                                                                                                           gatk_rna_filter: "${params.gatk_rna_filter})
+                                                                                                           gatk_rna_filter: "${params.gatk_rna_filter}")
 include MergeVCFs as MergeVCF from '../NextflowModules/GATK/4.1.3.0/MergeVCFs.nf' params(optional: '',mem: "${params.mergevcf.mem}")
 
 workflow gatk_variantfiltration {
