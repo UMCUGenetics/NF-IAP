@@ -1,0 +1,90 @@
+<h1 id="nf-iap">NF-IAP</h1>
+<p>Nextflow Illumina Analysis Pipeline. Includes pre/post-mapping QC, BWA mapping &amp; GATK germline calling and variant annotation. The workflow is able to start from multiple entry points (e.g. fastq, bam, gvcf or vcf).</p>
+<h2 id="installing-setup">Installing &amp; Setup</h2>
+<ol type="1">
+<li><a href="https://www.nextflow.io/docs/latest/getstarted.html#installation">Install Nextflow</a></li>
+<li><a href="https://sylabs.io/guides/3.5/admin-guide/">Install Singularity</a></li>
+<li><a href="#pull-or-clone">Pull/Clone NF-IAP</a></li>
+<li><a href="docs/resources.md">Get &amp; configure resources</a></li>
+<li><a href="docs/nextflow.md">Configure nextflow</a></li>
+<li><a href="docs/processes.md">Configure processes</a></li>
+</ol>
+<h2 id="pull-or-clone">Pull or Clone</h2>
+<p>Be sure to add the –recursive option to also included the neccessary modules.</p>
+<pre><code>git clone git@github.com:UMCUGenetics/NF-IAP.git --recursive</code></pre>
+<h2 id="running-the-workflow">Running the workflow</h2>
+<p>In this section we’ll provide you with a few different ways to run the workflow.</p>
+<h3 id="change-the-run-template.config-to-start-your-analysis">Change the run-template.config to start your analysis</h3>
+<p>Always keep these lines in your run.config file:</p>
+<pre><code>includeConfig &#39;/path/to/config/nextflow.config&#39;
+includeConfig &#39;/path/to/config/process.config&#39;
+includeConfig &#39;/path/to/config/resources.config&#39;</code></pre>
+<p>All of the parameters in the params section can also be supplied on the commandline or can be pre-filled in the run.config file.</p>
+<pre><code>params {
+  fastq_path = &#39;&#39;
+  bam_path = &#39;&#39;
+  vcf_path = &#39;&#39;
+  gvcf_path = &#39;&#39;
+  out_dir = &#39;&#39;
+  genome = &#39;GRCh37&#39;
+
+  premapQC = true
+  postmapQC = true
+  germlineCalling = true
+  variantFiltration = true
+  variantAnnotation = true
+}
+</code></pre>
+<h3 id="starting-the-full-workflow-from-fastq-files">Starting the full workflow from fastq files</h3>
+<p>Create the run.config file to look like this:</p>
+<pre><code>params {
+  fastq_path = &#39;/path/to/fastqfiles/&#39;
+  bam_path = &#39;&#39;
+  vcf_path = &#39;&#39;
+  gvcf_path = &#39;&#39;
+  out_dir = &#39;&#39;
+  genome = &#39;GRCh37&#39;
+
+  premapQC = true
+  postmapQC = true
+  germlineCalling = true
+  variantFiltration = true
+  variantAnnotation = true
+}</code></pre>
+<p>Run the workflow on sge :</p>
+<pre><code>nextflow run nf-iap.nf -c run.config --out_dir /processed_data/runX/ -profile sge -resume</code></pre>
+<h3 id="starting-the-full-workflow-from-from-a-combination-of-fastq-bam-and-gvcf-files">Starting the full workflow from from a combination of fastq, bam and gvcf files</h3>
+<p>Create the run.config file to look like this:</p>
+<pre><code>params {
+  fastq_path = &#39;/path/to/fastqfiles/&#39;
+  bam_path = &#39;/path/to/bamfiles/&#39;
+  vcf_path = &#39;&#39;
+  gvcf_path = &#39;/path/to/gvcffiles/&#39;
+  out_dir = &#39;&#39;
+  genome = &#39;GRCh37&#39;
+
+  premapQC = true
+  postmapQC = true
+  germlineCalling = true
+  variantFiltration = true
+  variantAnnotation = true
+}</code></pre>
+<p>Run the workflow on slurm :</p>
+<pre><code>nextflow run nf-iap.nf -c run.config --out_dir /processed_data/runX/ -profile slurm -resume</code></pre>
+<h3 id="starting-only-the-variant-annotation-on-one-or-more-vcf-files-cant-be-combined-with-fastqsbams-or-gvcfs.">Starting only the variant annotation on one or more vcf files (can’t be combined with fastq’s,bam’s or gvcf’s).</h3>
+<pre><code>params {
+  fastq_path = &#39;&#39;
+  bam_path = &#39;&#39;
+  vcf_path = &#39;/path/to/vcffiles/&#39;
+  gvcf_path = &#39;&#39;
+  out_dir = &#39;&#39;
+  genome = &#39;GRCh37&#39;
+
+  premapQC = false
+  postmapQC = false
+  germlineCalling = false
+  variantFiltration = false
+  variantAnnotation = true
+}</code></pre>
+<p>Run the workflow on slurm :</p>
+<pre><code>nextflow run nf-iap.nf -c run.config --out_dir /processed_data/runX/ -profile slurm -resume</code></pre>
