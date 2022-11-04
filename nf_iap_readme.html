@@ -1,0 +1,151 @@
+<h1 id="nf-iap-pipeline">NF-IAP PIPELINE</h1>
+<p>NF-IAP is a Nextflow Illumina Analysis Pipeline meant for processing of DNA (WGS/WES) data.</p>
+<p><a href="https://github.com/UMCUGenetics/NF-IAP">https://github.com/UMCUGenetics/NF-IAP</a></p>
+<p><strong>The pipeline performs the following tasks.</strong></p>
+<ul>
+<li>Read QC (FastQC)<br />
+</li>
+<li>Mapping (BWA)<br />
+</li>
+<li>QC (GATK)<br />
+</li>
+<li>PCR duplicate detection (Sambamba MarkDup)<br />
+</li>
+<li>Variant calling and filtering (GATK)<br />
+</li>
+<li>Variant annotation (snpEff and GATK)</li>
+<li>CNV calling (Control-FREEC)</li>
+<li>SV calling (Manta)</li>
+<li>QC report (MultiQC)</li>
+</ul>
+<h2 id="core-analysis-workflow">Core analysis workflow</h2>
+<p><img src="RNASeq-NF_workflow.png" width="600" ></p>
+<h2 id="download-and-information">Download and information</h2>
+<p>The pipeline can be downloaded from the link below:</p>
+<p><a href="https://github.com/UMCUGenetics/NF-IAP">https://github.com/UMCUGenetics/NF-IAP</a></p>
+<p>Follow the “Installing &amp; Setup” section to set up the pipeline for own use.</p>
+<h2 id="output-description">Output description</h2>
+<p>Descriptions of the contents of the resulting processed data folder.</p>
+<ul>
+<li><p><strong>.nextflow/</strong><br />
+Nextflow cache and logging files, not of importance for the user but kept for completeness</p></li>
+<li><p><strong>BAMS/</strong><br />
+The resulting aligned data in .bam format with corresponding .bam.bai index files. These can be viewed in for example the IGV genome browser or used for further analysis</p></li>
+<li><p><strong>CNV/</strong><br />
+The Copy Number Variation results, when requested, for the corresponding tools in this pipeline</p>
+<ul>
+<li><strong>CNV/FREEC/</strong><br />
+Control-FREEC CNV results</li>
+</ul></li>
+<li><p><strong>configs/</strong><br />
+A copy various general configuration files used for the pipeline, containing parameters, resources, etc</p></li>
+<li><p><strong>log/</strong><br />
+Pipeline logs and nextflow report files (regarding resource usage, time taken, etc)</p></li>
+<li><p><strong>QC/</strong><br />
+Various QC logs and reports</p>
+<ul>
+<li><p><strong>QC/fastqc/</strong><br />
+FastQC reports on the raw fastq files</p></li>
+<li><p><strong>QC/multiple_metrics/</strong><br />
+Collection of metrics as collected by CollectMultipleMetrics (Picard), such as: gc bias, base qualityscore distribution, etc. See <a href="https://gatk.broadinstitute.org/hc/en-us/articles/360037594031-CollectMultipleMetrics-Picard-">https://gatk.broadinstitute.org/hc/en-us/articles/360037594031-CollectMultipleMetrics-Picard-</a></p></li>
+<li><p><strong>QC/summary/</strong><br />
+MultiQC collects all information from the various QC modules as well as other tools (STAR, sambamba) and shows this in a summary overview in order to get a good and quick overview of the statistics of the various steps in the pipeline for this run</p></li>
+<li><p><strong>QC/wgs_metrics/</strong><br />
+Collection of metrics about coverage and performance of WGS experiments as collected by CollectWgsMetrics (Picard). See: <a href="https://gatk.broadinstitute.org/hc/en-us/articles/360037269351-CollectWgsMetrics-Picard-">https://gatk.broadinstitute.org/hc/en-us/articles/360037269351-CollectWgsMetrics-Picard-</a></p></li>
+</ul></li>
+<li><p><strong>SV/</strong><br />
+The Structural Variants results, when requested, for the corresponding tools in this pipeline</p>
+<ul>
+<li><strong>SV/MANTA/</strong><br />
+Manta SV results</li>
+</ul></li>
+<li><p><strong>VCFS/</strong><br />
+The variants called in both VCF and GVCF format for the samples in this run</p>
+<ul>
+<li><strong>VCFS/VCF/</strong><br />
+The variants called with GATK in VCF format, both filtered and annotated versions when requested<br />
+</li>
+<li><strong>VCFS/GVCF/</strong><br />
+GVCF file for each sample</li>
+</ul></li>
+<li><p><strong>work/</strong><br />
+The Nextflow working directory containing logs and script from the various cached steps. Kept for completeness and not of importance for the user</p></li>
+</ul>
+<h2 id="software">Software</h2>
+<p>Tools used:</p>
+<ul>
+<li>BWA v0.7.17 value_bwa<br />
+<a href="http://bio-bwa.sourceforge.net/">http://bio-bwa.sourceforge.net/</a><br />
+</li>
+<li>Control-FREEC v11.5 <a href="http://boevalab.inf.ethz.ch/FREEC/">http://boevalab.inf.ethz.ch/FREEC/</a></li>
+<li>FastQC v0.11.5 value_fastqc<br />
+<a href="https://www.bioinformatics.babraham.ac.uk/projects/fastqc/">https://www.bioinformatics.babraham.ac.uk/projects/fastqc/</a></li>
+<li>GATK v4.1.3.0 value_gatk <a href="https://gatk.broadinstitute.org/hc/en-us">https://gatk.broadinstitute.org/hc/en-us</a></li>
+<li>Manta v1.6.0 value_manta [https://github.com/Illumina/manta] (https://github.com/Illumina/manta)</li>
+<li>MultiQC value_multiqc<br />
+<a href="https://multiqc.info/">https://multiqc.info/</a></li>
+<li>Sambamba v0.6.8 value_sambamba<br />
+<a href="https://lomereiter.github.io/sambamba/docs/sambamba-flagstat.html">https://lomereiter.github.io/sambamba/docs/sambamba-flagstat.html</a></li>
+<li>snpEff v4.3.t value_snpeff [http://pcingola.github.io/SnpEff/] (http://pcingola.github.io/SnpEff/)</li>
+</ul>
+<h2 id="parameters">Parameters</h2>
+<p>When parameters are not specifically specified, the default parameters are used</p>
+<pre><code>// Custom settings of tools.
+  params.freec_ploidy = 2
+  params.freec_window = 1000
+  params.freec_telocentromeric = 50000
+  params.freec_maxlevel = 4
+  
+  params.bwa.optional = &#39;-M -c 100&#39;
+  params.bwaindex.optional = &#39;-a bwtsw&#39;
+  
+  params.haplotypecaller.optional = &#39;-ERC GVCF&#39;      
+  params.collectmultiplemetrics.optional = &#39;--PROGRAM CollectAlignmentSummaryMetrics --PROGRAM CollectInsertSizeMetrics --PROGRAM QualityScoreDistribution --PROGRAM MeanQualityByCycle --PROGRAM CollectBaseDistributionByCycle --PROGRAM CollectGcBiasMetrics --PROGRAM CollectSequencingArtifactMetrics --PROGRAM CollectQualityYieldMetrics&#39;
+  params.markdup.optional = &#39;--overflow-list-size=2000000&#39;
+  
+  params.snpefffilter.optional = &#39;GRCh37.75 -hgvs -lof -no-downstream -no-upstream -no-intergenic&#39;
+  params.snpsiftsbnsfp.optional = &#39;-f hg38_chr,hg38_pos,genename,Uniprot_acc,Uniprot_id,Uniprot_aapos,Interpro_domain,cds_strand,refcodon,SLR_test_statistic,codonpos,fold-degenerate,Ancestral_allele,Ensembl_geneid,Ensembl_transcriptid,aapos,aapos_SIFT,aapos_FATHMM,SIFT_score,SIFT_converted_rankscore,SIFT_pred,Polyphen2_HDIV_score,Polyphen2_HDIV_rankscore,Polyphen2_HDIV_pred,Polyphen2_HVAR_score,Polyphen2_HVAR_rankscore,Polyphen2_HVAR_pred,LRT_score,LRT_converted_rankscore,LRT_pred,MutationTaster_score,MutationTaster_converted_rankscore,MutationTaster_pred,MutationAssessor_score,MutationAssessor_rankscore,MutationAssessor_pred,FATHMM_score,FATHMM_rankscore,FATHMM_pred,MetaSVM_score,MetaSVM_rankscore,MetaSVM_pred,MetaLR_score,MetaLR_rankscore,MetaLR_pred,Reliability_index,VEST3_score,VEST3_rankscore,PROVEAN_score,PROVEAN_converted_rankscore,PROVEAN_pred,CADD_raw,CADD_raw_rankscore,CADD_phred,GERP++_NR,GERP++_RS,GERP++_RS_rankscore,phyloP46way_primate,phyloP46way_primate_rankscore,phyloP46way_placental,phyloP46way_placental_rankscore,phyloP100way_vertebrate,phyloP100way_vertebrate_rankscore,phastCons46way_primate,phastCons46way_primate_rankscore,phastCons46way_placental,phastCons46way_placental_rankscore,phastCons100way_vertebrate,phastCons100way_vertebrate_rankscore,SiPhy_29way_pi,SiPhy_29way_logOdds,SiPhy_29way_logOdds_rankscore,LRT_Omega,UniSNP_ids,1000Gp1_AC,1000Gp1_AF,1000Gp1_AFR_AC,1000Gp1_AFR_AF,1000Gp1_EUR_AC,1000Gp1_EUR_AF,1000Gp1_AMR_AC,1000Gp1_AMR_AF,1000Gp1_ASN_AC,1000Gp1_ASN_AF,ESP6500_AA_AF,ESP6500_EA_AF,ARIC5606_AA_AC,ARIC5606_AA_AF,ARIC5606_EA_AC,ARIC5606_EA_AF,ExAC_AC,ExAC_AF,ExAC_Adj_AC,ExAC_Adj_AF,ExAC_AFR_AC,ExAC_AFR_AF,ExAC_AMR_AC,ExAC_AMR_AF,ExAC_EAS_AC,ExAC_EAS_AF,ExAC_FIN_AC,ExAC_FIN_AF,ExAC_NFE_AC,ExAC_NFE_AF,ExAC_SAS_AC,ExAC_SAS_AF,clinvar_rs,clinvar_clnsig,clinvar_trait,COSMIC_ID,COSMIC_CNT&#39;
+  params.snpsiftannotate.optional = &#39;-tabix -name GoNLv5 -info AF,AN,AC&#39;
+  
+  </code></pre>
+<h2 id="resources">Resources</h2>
+<p>The following resources and pipeline/nextflow versions were used for this run:</p>
+<ul>
+<li><em>Pipeline Version:</em><br />
+value_pipeline<br />
+</li>
+<li><em>Nextflow Version:</em><br />
+value_nextflow<br />
+</li>
+<li><em>Genome:</em><br />
+value_genome<br />
+</li>
+<li><em>Genome fasta:</em><br />
+value_fasta<br />
+</li>
+<li><em>Genome GTF: </em><br />
+value_gtf<br />
+</li>
+<li><em>Mode:</em><br />
+value_mode</li>
+</ul>
+<h2 id="material-and-methods">Material and Methods</h2>
+<p><strong>NF-IAP analysis</strong></p>
+<p>Quality control on the sequence reads from the raw FASTQ files was done with FastQC (value_fastqc). Reads were aligned to the reference genome fasta (value_fasta) using the BWA-mem (value_star) as the aligner. Followup QC on the mapped (bam) files was done using Sambamba (value_sambamba), GATK (value_gatk) CollectMultipleMetrics and CollectWGSMetrics. Variant calling is done using GATK best practises, including BaseQualityScoreRecalibration (BQSR), HaplotypeCaller, VariantSelection and VariantFiltration. Annotation is done using GATK and snpEff, depending on the genome. Finally a summary report was created using MultiQC (value_multiqc).</p>
+<p>Methods and Materials Sample acquisition and library preparation We ordered 50 μg NA12878 cell line genomic DNA (Cat No. GM12878, Coriell), and the concentration was detected by Qubit fluorometer 3.0 (Invitrogen), the integrity and purification was detected by 1% Agarose Gel Electrophoresis, ensured to be of high quality with no visible degradation. After sample testing, the genomic DNA was constructed as Illumina &amp; BGISEQ exome library and whole genome sequencing library. For Illumina library construction, 1 μg NA12878 genomic DNA was fragmented by Covaris E220 to DNA fragments, between 100 bp and 500 bp (for exome library), or between 150 bp and 800 bp (for whole genome sequencing library), respectively, and the Illumina adapter was ligated to both ends of DNA fragments used SureSelectXT Reagent Kit (Cat No. G9611A, Agilent), PCR amplification were applied to each sample after ligation, then the whole genome sequencing library was finished. On the other hands, the exome library was captured using the Human All Exon V5 Target Enrichment Baits (Cat No. 519-6216, Agilent). For BGISEQ exome and whole genome sequencing library construction, 1 μg genomic DNA was fragmented by Covaris E220 to DNA fragments between 50 bp and 400 bp, and then the DNA fragments was selected to between 100 bp and 300 bp by AMPure XP beads (AGENCOURT). After that, we used the MGIEasy™ DNA Library Prep Kit V1 (Cat No. 85-05533-00, BGI) to construct BGISEQ library, then the whole genome sequencing library was finished. Meanwhile, the exome library was captured using the Human All Exon V5 Target Enrichment Baits (Cat No. 519-6216, Agilent). Finally, All BGISEQ library were circularised to generate single stranded DNA circles.</p>
+<p>Data sets from multiple sequencing platforms All prepared library was sent to BGI for sequencing. The Illumina exome and whole genome sequencing library was sequenced for pair end 150 on the HiSeq Xten, HiSeq4000 and NovaSeq sequencing platform. In contrast the BGISEQ exome and whole genome sequencing was sequenced for pair-end 100 bp on the BGISEQ-500 and MGISEQ-2000 sequencing platform. To avoid biased results by NGS platform, we used a similar two number of data sets sequenced by HiSeq4000, NovaSeq, BGI500 and MGISEQ2000, respectively. However, there was only one NA12878 whole genome sequence data set for Xten available for this study. Nine sequenced reads data sets for NA12878 were available for downloading from public databases: Sequence Read Archive (SRA) (https://www.ncbi.nlm.nih.gov/bioproject/PRJNA511646/). Short reads of each data set for WES and WGS were conducted filtering and trimming by fastp16.</p>
+<p>Read alignment and pretreatment After quality assessment, the sequence reads were mapped them to the GRCh38 reference genome through BWA-MEM (0.7.17), and then aligned reads were converted to bam files of the binary version of sequenced alignment/map files (known as SAM files) with Samtools (v1.2). Alignment was done with default parameter settings. For each data sets, we used MarkDuplicate to remove duplicates in each bam files, Sorting based on genome position and Merge if necessary in Picard (v2.18.11) to prepare the analysis-ready datasets.</p>
+<p>Identifying variants using three variant calling pipelines We analyzed mutations of each aligned datasets by using three variant calling pipelines: (1) Genome Analysis Tool Kit- HaplotypeCaller (v4.0.8.1), (2) Strelka2 (v2.9.7) and (3) Samtools-Varscan2 (v1.2 and v2.3.9, respectively). The former two pipelines call SNPs and INDELs jointly while SV detects SNPs and INDELs separately. Among them, GATK and SV were run via the recommended parameter of each variant caller, and SK2 was run with the default settings. For GATK pipeline, This workflow was applied using best practices described by the GATK developers: https://software.broadinstitute.org/gatk/best-practices, We performed base quality score recalibration (BQSR) on the raw BAM files, which used the default parameters or suggested input files, such as the most recent dbSNP VCF file, HapMap genotype file and OMNI 2.5 genotype VCF file. And the raw variants identified by the genotyping tool were refined using VariantFiltration, with parameters QualByDepth, FisherStrand, StrandOddsRatio, RMSMappingQuality, MQRankSum and ReadPosRankSum were &lt;2.0, &lt;40.0, &gt;60.0, &gt;3.0, &lt;12.5 and &lt;−8.0 as recommended, respectively.</p>
+<p>For calling variants by SK2, we used mark-duplicated BAM files, described in the previous section without any additional process. And SK2 was run with the default settings. For SV pipeline, the analysis-ready datasets from GATK were performed Samtools mpileup functionality and run with a filter on mapping quality. Only reads with mapping quality 1 or higher and the max depth below 30000 were included in the pileup information. SNPs and INDELs were called by two separate functions of Varscan2, namely: pileup2snp and pileup2indel. min-coverage Minimum was set to 8, minimum variant allele frequency was set to 0.2 and p-value threshold was set to 0.1. For other parameters default settings were applied. After running the three variant callers for each of data sets, we regularized the 27 different variant calls files, in which 12 for WES and 15 for WGS, to the same variant calling format (VCF) that represented the results of each combination of sequencers-pipelines so as to the conduct further performance evaluation and comparison. All methods were tested on Linux CentOS 7.</p>
+<p>Evaluation of performance in variant-calling accuracy For benchmarking variant calls identified by multiple combinations, the highly confident variant calls including SNPs and INDELs provided by NIST GIAB consortium (http://www.genomeinabottle.org) were used as the gold standard variants set in this study. Results were compared with high-confidence calls from GIAB truth sets in hap.py (https://github.com/Illumina/hap.py). To assess the performance of variant calling pipelines, we used precision-recall curves. We defined true positive (TP), true negative (TN), false positive (FP), and false negative (FN) variants as follows:</p>
+<ol type="1">
+<li><p>TP: variants called by a variant caller in high confident regions as the same genotype as the gold standard data</p></li>
+<li><p>TN: reference alleles in high confident regions other than gold standard variants</p></li>
+<li><p>FP: variants called by a variant caller in high confident regions but not as the same genotype as the gold standard data</p></li>
+<li><p>FN: gold standard variants in high confident that were not called by a variant caller</p></li>
+<li><p>Precision: TP/(TP + FP)</p></li>
+<li><p>Recall: TP/(TP + FN)</p></li>
+<li><p>F-score: 2* Precision*Recall/(Precision + Recall)</p></li>
+</ol>
+<p>Datasets down-sampling and measurement of running time We used DownsampleSam command in Picard (v2.18.11) to down-sample the analysis-ready datasets (the sorted and mark-duplicated BAM file). Strategy was set to default, accuracy was set to 0.0001, and probabilities vary according to the coverage of down-sampled datasets. We first down-sampled the original WES and WGS datasets to the same coverage (WES in 100X and WGS in 30X), Then again down-sample the coverage of datasets above to a series of gradient coverage (WES in 20, 40, 60, 80X and WGS in 6X, 12X, 18X, 24X) across multiple platforms, then the variants calling period consumed by the three pipelines at each coverage were counted, respectively.</p>
+<p>For Strelka2, GATK4 (including BQSR step and calling step) and Samtools-Varscan2 (including mpileup step and calling step), the wallclock time was recorded by using Time command in shell script and parsed in Linux logfile. Note that the runtime of the entire variants calling workflow was higher due to additional steps other than variant calling, such as preparation for parallelization, quality control and variant annotation. We reported only the time elapsed during variant calling.</p>

@@ -8,19 +8,36 @@ workflow snpeff_gatk_annotate {
   take:
     vcfs
   main:
-    //Run snpEffFilter annotation step
+    //Run snpEffFilter annotation step, snpeff should at least be possible
     SNPEffFilter(vcfs)
-
     // Run snpSift filter step
-    SNPSiftDbnsfp(SNPEffFilter.out)
+    if (params.genome_dbnsfp){
+        SNPSiftDbnsfp(SNPEffFilter.out)
+    }
 
     //Run GATK Cosmic annotation step
-    VariantAnnotator(SNPSiftDbnsfp.out)
+    if(params.genome_variant_annotator_db){
+        if (params.genome_dbnsfp){
+            VariantAnnotator(SNPSiftDbnsfp.out)
+        }else{
+            VariantAnnotator(SNPEffFilter.out)
+        }
+    }
 
     //Run snpSift GoNL annotation step
-    SNPSiftAnnotate(VariantAnnotator.out)
-
+    if(params.genome_variant_annotator_db){
+        if (params.genome_dbnsfp){
+            SNPSiftAnnotate(VariantAnnotator.out)
+        }else if (params.genome_dbnsfp){
+            SNPSiftAnnotate(SNPSiftDbnsfp.out)        
+        }else{
+            SNPSiftAnnotate(SNPEffFilter.out)
+        }
+    }
   emit:
+    SNPEffFilter.out
+    SNPSiftDbnsfp.out
+    VariantAnnotator.out
     SNPSiftAnnotate.out
 
 }
