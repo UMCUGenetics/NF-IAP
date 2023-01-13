@@ -74,6 +74,20 @@ if (!params.genome){
   params.genome_interval_list = params.genomes[params.genome].interval_list
 }
 
+if ( params.runReport ) {
+  if (!params.report_template ) {
+      report_template = Channel
+        .fromPath( file("$baseDir/nf_iap_readme.md"), checkIfExists: true )
+        .ifEmpty { exit 1, "Default report template $baseDir/nf_iap_readme.md not found, and none specified! Please specify one with --report_template or disable report step"}
+  } else {
+    // Try importing.
+    report_template = Channel
+        .fromPath( params.report_template, checkIfExists: true )
+        .ifEmpty { exit 1, "Markdown report template not found: ${params.report_template}"}
+  } 
+}
+
+
 /*=================================
           Run workflow
 =================================*/
@@ -130,6 +144,14 @@ workflow {
       postmap_QC( input_bams )
     }
 
+    if (params.variantFiltration || params.germlineCalling){
+        include gatk_germline_calling from './workflows/gatk_germline_calling.nf' params(params)
+
+    }
+    if (params.variantAnnotation || params.variantFiltration){
+        include gatk_variantfiltration from './workflows/gatk_variantfiltration.nf' params(params)
+    }
+
     // // Depending on whether input_bams and/or input_gvcf were provide start from gatk_bqsr or directly from gatk_germline_calling.
     // // gatk_germline_calling supports both bam and/or gvcf input (one of the channels can be empty)
     if (params.germlineCalling){
@@ -137,23 +159,29 @@ workflow {
       params.genome_known_sites = params.genomes[params.genome].gatk_known_sites
       params.genome_dbsnp = params.genomes[params.genome].dbsnp
       include gatk_bqsr from './workflows/gatk_bqsr.nf' params(params)
-      include gatk_germline_calling from './workflows/gatk_germline_calling.nf' params(params)
+      //include gatk_germline_calling from './workflows/gatk_germline_calling.nf' params(params)
+
+      //apply BQSR when known sites are supplied, otherwise continue with original input bams
+      def bqsr_bams
+      if (input_bams && params.genome_known_sites){
+        gatk_bqsr( input_bams )
+        bqsr_bams = gatk_bqsr.out
+      }else{
+        bqsr_bams = input_bams
+      }
 
       if (input_bams && input_gvcf){
-        gatk_bqsr( input_bams )
-        gatk_germline_calling(gatk_bqsr.out, input_gvcf )
+        gatk_germline_calling(bqsr_bams, input_gvcf )
       }else if(input_bams){
-        gatk_bqsr( input_bams )
-        gatk_germline_calling(gatk_bqsr.out, Channel.empty() )
+        gatk_germline_calling(bqsr_bams, Channel.empty() )
       }else if(input_gvcf){
         gatk_germline_calling(Channel.empty(), input_gvcf)
       }
     }
 
-
+    
     //Run variant filtration on generated vcfs or input vcfs
-    if (params.variantFiltration){
-      include gatk_variantfiltration from './workflows/gatk_variantfiltration.nf' params(params)
+    if (params.variantFiltration){      
       if( gatk_germline_calling.out ){
         gatk_variantfiltration(gatk_germline_calling.out[0])
       }else if (input_vcf){
@@ -228,5 +256,11 @@ workflow {
       params.genome_freec_mappability = params.genomes[params.genome].freec_mappability
       include cnv_calling from './workflows/cnv_calling.nf' params(params)
       cnv_calling(input_bams)
+    }
+
+    //
+    if ( params.runReport ) {
+        include { generate_report } from './workflows/generate_report.nf' params(params)
+        generate_report ( "NF-IAP_report", report_template )
     }
 }
