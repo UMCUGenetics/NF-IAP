@@ -1,5 +1,5 @@
-include { MarkdownToHtml } from '../NextflowModules/Pandocker/21.02/MarkdownToHtml.nf' params( params )
-include { MarkdownToPdf } from '../NextflowModules/Pandocker/21.02/MarkdownToPdf.nf' params( params )
+include { MarkdownToHtml } from params.nextflowmodules_path+'/Pandocker/21.02/MarkdownToHtml.nf' params( params )
+include { MarkdownToPdf } from params.nextflowmodules_path+'/Pandocker/21.02/MarkdownToPdf.nf' params( params )
 include { FillMdTemplate } from '../utils/FillMdTemplate.nf' params( params )    
 
 workflow generate_report {

@@ -1,22 +1,25 @@
 params {
+  fastqc.mem = '1G'
+
   gatk_snp_filter="--filter-expression 'QD < 2.0' --filter-expression 'MQ < 40.0' --filter-expression 'FS > 60.0' --filter-expression 'HaplotypeScore > 13.0' --filter-expression 'MQRankSum < -12.5' --filter-expression 'ReadPosRankSum < -8.0' --filter-expression 'MQ0 >= 4 && ((MQ0 / (1.0 * DP)) > 0.1)' --filter-expression 'DP < 5' --filter-expression 'QUAL < 30' --filter-expression 'QUAL >= 30.0 && QUAL < 50.0' --filter-expression 'SOR > 4.0' --filter-name 'SNP_LowQualityDepth' --filter-name 'SNP_MappingQuality' --filter-name 'SNP_StrandBias' --filter-name 'SNP_HaplotypeScoreHigh' --filter-name 'SNP_MQRankSumLow' --filter-name 'SNP_ReadPosRankSumLow' --filter-name 'SNP_HardToValidate' --filter-name 'SNP_LowCoverage' --filter-name 'SNP_VeryLowQual' --filter-name 'SNP_LowQual' --filter-name 'SNP_SOR' -cluster 3 -window 10"
   gatk_indel_filter="--filter-expression 'QD < 2.0' --filter-expression 'ReadPosRankSum < -20.0' --filter-expression 'FS > 200.0' --filter-name 'INDEL_LowQualityDepth' --filter-name 'INDEL_ReadPosRankSumLow' --filter-name 'INDEL_StrandBias'"
   gatk_rna_filter="--filter-name 'FS' --filter-expression 'FS > 30.0' --filter-name 'QD' --filter-expression 'QD < 2.0'"
+
 }
 
 
 process {
     //errorStrategy = 'retry'
-    maxRetries = 1
+    //maxRetries = 1
 
     /* GENERIC TOOL SETTINGS */
     withLabel : 'GATK_4_3_0_0' {
-      time = {24h * task.attempt}
-      memory = {34G * task.attempt}
+      time = '24h'
+      memory = '34G'
     }
     withLabel : 'SNPEff_5_1d' {
-      time = {24h * task.attempt}
-      memory = {34G * task.attempt}
+      time = '24h'
+      memory = '34G'
     }
 
     withLabel : ControlFreec_11_6 {
@@ -29,97 +32,96 @@ process {
     }
 
 
-    /* PROCESS SPEC IC SETTING */
+    /* PROCESS SPECIFIC SETTING */
     withLabel : BWA_0_7_17_Mem {
-      params.bwa.mem = {24.G * task.attempt}
+      params.bwa.mem = '24G'
       params.bwa.optional = '-M -c 100'
       cpus = 12
       penv = 'threaded'
       memory = params.bwa.mem
-      //memory = {24.G * task.attempt}
-      time = {12.h}
+      time = '12h'
     }
     withLabel : BWA_0_7_17_Index{
-      params.bwaindex.mem = {32.G * task.attempt}
+      params.bwaindex.mem = '32G'
       params.bwaindex.optional = '-a bwtsw'
       cpus = 1
       memory = params.bwaindex.mem
-      time = {12.h * task.attempt}
+      time = '12h'
     }
 
     withLabel : FastQC_0_11_9 {
-      params.fastqc.mem = {4G * task.attempt}
+      params.fastqc.mem = '4G'
       params.fastqc.optional = '--noextract'
       memory = params.fastqc.mem
-      time = {2h * task.attempt}
+      time = '2h'
       publishDir.path = "${params.out_dir}/QC/fastqc"
       publishDir.mode = 'copy'
     }
 
     withLabel : ControlFreec_11_6_Freec {
-      params.freec.mem = {80G * task.attempt}
+      params.freec.mem = '80G'
       memory = params.freec.mem
-      time = {8h * task.attempt}
+      time = '8h'
       cpus = 8
     }
     withLabel : ControlFreec_11_6_MakeKaryotype {
-      memory = {4G * task.attempt}
-      time = {1h * task.attempt}
+      memory = '4G'
+      time = '1h'
       cpus = 1
     }
     withLabel : ControlFreec_11_6_MakeGraph {
-      memory = {4G * task.attempt}
-      time = {1h * task.attempt}
+      memory = '4G'
+      time = '1h'
       cpus = 1
     }
     withLabel : ControlFreec_11_6_AssessSignificance {
-      memory = {4G * task.attempt}
-      time = {4h * task.attempt}
+      memory = '4G'
+      time = '4h'
       cpus = 1
     }
 
     withLabel : GATK_4_3_0_0_BaseRecalibrationTable {
-      params.baserecalibrator.mem = {9G * task.attempt}
+      params.baserecalibrator.mem = '9G'
       memory = params.baserecalibrator.mem
-      time = {1h * task.attempt}
+      time = '1h'
     }
 
     withLabel : GATK_4_3_0_0_GatherBaseRecalibrationTables {
-      params.gatherbaserecalibrator.mem = {6G * task.attempt}
+      params.gatherbaserecalibrator.mem = '6G'
       memory = params.gatherbaserecalibrator.mem
-      time = {1h * task.attempt}
+      time = '1h'
     }
 
     withLabel : GATK_4_3_0_0_BaseRecalibration {
-      params.applybqsr.mem = {9G * task.attempt}
+      params.applybqsr.mem = '9G'
       memory = params.applybqsr.mem
-      time = {1h * task.attempt}
+      time = '1h'
 
     }
     withLabel: GATK_4_3_0_0_SplitIntervals{
-      params.splitintervals.mem = {6G * task.attempt}
+      params.splitintervals.mem = '6G'
       params.splitintervals.optional = '--SCATTER_COUNT 1000 --UNIQUE true -M BALANCING_WITHOUT_INTERVAL_SUBDIVISION_WITH_OVERFLOW'
       memory = params.splitintervals.mem
-      time = {1h * task.attempt}
+      time = '1h'
     }
 
     withLabel : GATK_4_3_0_0_HaplotypeCaller {
-      params.haplotypecaller.mem = {12G * task.attempt}
+      params.haplotypecaller.mem = '12G'
       params.haplotypecaller.optional = '-ERC GVCF'
       memory = params.haplotypecaller.mem
-      time = {12h * task.attempt}
+      time = '12h'
     }
 
     withLabel : GATK_4_3_0_0_CombineGVCFs {
-      params.combinegvcfs.mem = {16G * task.attempt}
+      params.combinegvcfs.mem = '16G'
       memory = params.combinegvcfs.mem
-      time = {4h * task.attempt}
+      time = '4h'
     }
 
     withLabel : GATK_4_3_0_0_MergeVCFs {
-      params.mergevcf.mem = {24G * task.attempt}
+      params.mergevcf.mem = '24G'
       memory = params.mergevcf.mem
-      time = {4h * task.attempt}
+      time = '4h'
       publishDir.path = "${params.out_dir}/VCFS"
       publishDir.mode = 'copy'
       publishDir.saveAs = {filename ->
@@ -132,130 +134,122 @@ process {
     }
 
     withLabel : GATK_4_3_0_0_GenotypeGVCFs {
-      params.genotypegvcfs.mem = {16G * task.attempt}
+      params.genotypegvcfs.mem = '16G'
       memory = params.genotypegvcfs.mem
-      time = {4h * task.attempt}
+      time = '4h'
 
     }
 
     withLabel : GATK_4_3_0_0_SelectVariants {
-      params.selectvariants.mem = {8G * task.attempt}
+      params.selectvariants.mem = '8G'
       memory = params.selectvariants.mem
-      time = {4h * task.attempt}
+      time = '4h'
     }
 
     withLabel : GATK_4_3_0_0_VariantFiltration {
-      params.variantfiltration.mem = {8G * task.attempt}
+      params.variantfiltration.mem = '8G'
       memory = params.variantfiltration.mem
-      time = {4h * task.attempt}
+      time = '4h'
     }
 
     withLabel : GATK_4_3_0_0_VariantAnnotator {
-      params.variantannotator.mem = {16G * task.attempt}
+      params.variantannotator.mem = '16G'
       memory = params.variantannotator.mem
-      time = {4h * task.attempt}
+      time = '4h'
     }
 
     withLabel : GATK_4_3_0_0_CollectMultipleMetrics {
-      params.collectmultiplemetrics.mem = {24G * task.attempt}
+      params.collectmultiplemetrics.mem = '24G'
       params.collectmultiplemetrics.optional = '--PROGRAM CollectAlignmentSummaryMetrics --PROGRAM CollectInsertSizeMetrics --PROGRAM QualityScoreDistribution --PROGRAM MeanQualityByCycle --PROGRAM CollectBaseDistributionByCycle --PROGRAM CollectGcBiasMetrics --PROGRAM CollectSequencingArtifactMetrics --PROGRAM CollectQualityYieldMetrics'
       memory = params.collectmultiplemetrics.mem
-      time = {8h * task.attempt}
+      time = '8h'
       publishDir.path = "${params.out_dir}/QC/multiple_metrics"
       publishDir.mode = 'copy'
     }
 
     withLabel : GATK_4_3_0_0_CollectWGSMetrics {
-      params.collectwgsmetrics.mem = {20G * task.attempt}
+      params.collectwgsmetrics.mem = '20G'
       memory = params.collectwgsmetrics.mem
-      time = {8h * task.attempt}
+      time = '8h'
       publishDir.path = "${params.out_dir}/QC/wgs_metrics"
       publishDir.mode = 'copy'
     }
 
     withLabel : Manta_1_6_0_ConfigAndRun {
-      params.manta.mem = {34G * task.attempt}
+      params.manta.mem = '34G'
       cpus = 8
       penv = 'threaded'
       memory = params.manta.mem
-      time= {12h * task.attempt}
+      time= '12h'
       publishDir.path = "${params.out_dir}/SV/MANTA"
       publishDir.mode = 'copy'
     }
 
     withLabel : MultiQC_1_14 {
-      params.multiqc.mem = {4G * task.attempt}
+      params.multiqc.mem = '4G'
       params.multiqc.optional = '--interactive'
       memory = params.multiqc.mem
-      time = {1h * task.attempt}
+      time = '1h'
       publishDir.path = "${params.out_dir}/QC/summary"
       publishDir.mode = 'copy'
     }
 
     withLabel : Sambamba_0_8_2_Markdup {
-      params.markdup.mem = {24G * task.attempt}
+      params.markdup.mem = '24G'
       params.markdup.optional = '--overflow-list-size=2000000'
       cpus = 10
       penv = 'threaded'
       memory = params.markdup.mem
-      time = {8h * task.attempt}
-      if (params.saveBam ) {
-        publishDir.path = "${params.out_dir}/BAMS"
-        publishDir.mode = 'copy'
-      }
+      time = '8h'
+      publishDir.path = "${params.out_dir}/BAMS"
+      publishDir.mode = 'copy'
     }
 
-    withLabel : skip_Sambamba_0_8_2_MarkdupMerge {
-      params.markdup.mem = {24G * task.attempt}
+    withLabel : Sambamba_0_8_2_MarkdupMerge {
+      params.markdup.mem = '24G'
       params.markdup.optional = '--overflow-list-size=2000000'
       cpus = 10
       penv = 'threaded'
       memory = params.markdup.mem
-      time = {8h * task.attempt}
-      if (params.saveBam ) {
-        publishDir.path = "${params.out_dir}/BAMS"
-        publishDir.mode = 'copy'
-      }
+      time = '8h'
+      publishDir.path = "${params.out_dir}/BAMS"
+      publishDir.mode = 'copy'
     }
 
     withLabel : Sambamba_0_8_2_MergeBams {
-      params.mergebams.mem = {12G * task.attempt}
+      params.mergebams.mem = '12G'
       cpus = 10
       penv = 'threaded'
       memory = params.mergebams.mem
-      time = {4h * task.attempt}
-      if (params.saveBam ) {
-        publishDir.path = "${params.out_dir}/BAMS"
-        publishDir.mode = 'copy'
-        publishDir.saveAs = {filename ->
-          if (filename.indexOf("_dedup.bam") > 0) "$filename"
-          else if  (filename.indexOf("_dedup.bai") > 0) "$filename"
-          else if  (filename.indexOf("_recalibrated.bam") > 0) null
-          else if  (filename.indexOf("_recalibrated.bai") > 0) null }
-      }
+      time = '4h'
+      publishDir.path = "${params.out_dir}/BAMS"
+      publishDir.mode = 'copy'
+      publishDir.saveAs = {filename ->
+        if (filename.indexOf("_dedup.bam") > 0) "$filename"
+        else if  (filename.indexOf("_dedup.bai") > 0) "$filename"
+        else if  (filename.indexOf("_recalibrated.bam") > 0) null
+        else if  (filename.indexOf("_recalibrated.bai") > 0) null }
     }
 
     withLabel : SNPEff_5_1d_SNPEffFilter {
-      params.snpefffilter.mem = {24G * task.attempt}
-      //params.snpefffilter.optional = 'GRCh37.75 -hgvs -lof -no-downstream -no-upstream -no-intergenic'
-      params.snpefffilter.optional = '-hgvs -lof -no-downstream -no-upstream -no-intergenic'
-      params.snpeff_datadir = '/hpc/ubec/resources/tools/snpeff_51d/data'
+      params.snpefffilter.mem = '24G'
+      params.snpefffilter.optional = 'GRCh37.75 -hgvs -lof -no-downstream -no-upstream -no-intergenic'
       memory = params.snpefffilter.mem
-      time = {4h * task.attempt}
+      time = '4h'
     }
 
     withLabel : SNPEff_5_1d_SNPSiftDbnsfp {
-      params.snpsiftsbnsfp.mem = {20G * task.attempt}
+      params.snpsiftsbnsfp.mem = '20G'
       params.snpsiftsbnsfp.optional = '-f hg38_chr,hg38_pos,genename,Uniprot_acc,Uniprot_id,Uniprot_aapos,Interpro_domain,cds_strand,refcodon,SLR_test_statistic,codonpos,fold-degenerate,Ancestral_allele,Ensembl_geneid,Ensembl_transcriptid,aapos,aapos_SIFT,aapos_FATHMM,SIFT_score,SIFT_converted_rankscore,SIFT_pred,Polyphen2_HDIV_score,Polyphen2_HDIV_rankscore,Polyphen2_HDIV_pred,Polyphen2_HVAR_score,Polyphen2_HVAR_rankscore,Polyphen2_HVAR_pred,LRT_score,LRT_converted_rankscore,LRT_pred,MutationTaster_score,MutationTaster_converted_rankscore,MutationTaster_pred,MutationAssessor_score,MutationAssessor_rankscore,MutationAssessor_pred,FATHMM_score,FATHMM_rankscore,FATHMM_pred,MetaSVM_score,MetaSVM_rankscore,MetaSVM_pred,MetaLR_score,MetaLR_rankscore,MetaLR_pred,Reliability_index,VEST3_score,VEST3_rankscore,PROVEAN_score,PROVEAN_converted_rankscore,PROVEAN_pred,CADD_raw,CADD_raw_rankscore,CADD_phred,GERP++_NR,GERP++_RS,GERP++_RS_rankscore,phyloP46way_primate,phyloP46way_primate_rankscore,phyloP46way_placental,phyloP46way_placental_rankscore,phyloP100way_vertebrate,phyloP100way_vertebrate_rankscore,phastCons46way_primate,phastCons46way_primate_rankscore,phastCons46way_placental,phastCons46way_placental_rankscore,phastCons100way_vertebrate,phastCons100way_vertebrate_rankscore,SiPhy_29way_pi,SiPhy_29way_logOdds,SiPhy_29way_logOdds_rankscore,LRT_Omega,UniSNP_ids,1000Gp1_AC,1000Gp1_AF,1000Gp1_AFR_AC,1000Gp1_AFR_AF,1000Gp1_EUR_AC,1000Gp1_EUR_AF,1000Gp1_AMR_AC,1000Gp1_AMR_AF,1000Gp1_ASN_AC,1000Gp1_ASN_AF,ESP6500_AA_AF,ESP6500_EA_AF,ARIC5606_AA_AC,ARIC5606_AA_AF,ARIC5606_EA_AC,ARIC5606_EA_AF,ExAC_AC,ExAC_AF,ExAC_Adj_AC,ExAC_Adj_AF,ExAC_AFR_AC,ExAC_AFR_AF,ExAC_AMR_AC,ExAC_AMR_AF,ExAC_EAS_AC,ExAC_EAS_AF,ExAC_FIN_AC,ExAC_FIN_AF,ExAC_NFE_AC,ExAC_NFE_AF,ExAC_SAS_AC,ExAC_SAS_AF,clinvar_rs,clinvar_clnsig,clinvar_trait,COSMIC_ID,COSMIC_CNT'
       memory =   params.snpsiftsbnsfp.mem
-      time = {4h * task.attempt}
+      time = '4h'
     }
 
     withLabel : SNPEff_5_1d_SNPSiftAnnotate {
-      params.snpsiftannotate.mem = {16G * task.attempt}
+      params.snpsiftannotate.mem = '16G'
       params.snpsiftannotate.optional = '-tabix -name GoNLv5 -info AF,AN,AC'
       memory = params.snpsiftannotate.mem
-      time = {12h * task.attempt}
+      time = '12h'
       publishDir.path = "${params.out_dir}/VCFS"
       publishDir.mode = 'copy'
       publishDir.saveAs = {filename ->
@@ -266,9 +260,9 @@ process {
     }
 
     withLabel : Tabix_1_11 {
-      params.tabix.mem = {16G * task.attempt}
+      params.tabix.mem = '16G'
       memory = params.tabix.mem
-      time = {2h * task.attempt}
+      time = '2h'
       publishDir.path = "${params.out_dir}/VCFS"
       publishDir.mode = 'copy'
       publishDir.saveAs = {filename ->
@@ -277,15 +271,12 @@ process {
     }
 
     withLabel : Samtools_1_16_1_SamToCram {
-      params.samtocram.mem = {24G * task.attempt}
+      params.samtocram.mem = '24G'
       memory = params.samtocram.mem
       cpus = 4
       penv = 'threaded'
-      time = {4h * task.attempt}
-      params.cram_embedref = true
-      if (params.saveCram ) {
-        publishDir.path = "${params.out_dir}/CRAMS"
-        publishDir.mode = 'copy'
-      }
+      time = '4h'
+      publishDir.path = "${params.out_dir}/CRAMS"
+      publishDir.mode = 'copy'
     }
 }

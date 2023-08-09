@@ -1,5 +1,5 @@
 #!/usr/bin/env nextflow
-nextflow.preview.dsl=2
+nextflow.enable.dsl=2
 
 /*===========================================================
                         NF-IAP
@@ -53,6 +53,24 @@ if(params.help){
   exit 0
 }
 
+if(params.test){
+   print "Testing: "+params.test
+   test_file=Channel
+        .fromPath( params.test, checkIfExists: true )
+        .ifEmpty { exit 1, "Test-file not found: ${params.test_file}"}  
+
+   myfile = file(params.test)
+   name = myfile.getName() 
+   basename = myfile.getBaseName()  
+   simplename = myfile.getSimpleName() 
+   extension = myfile.getExtension() 
+   print "Name: "+name
+   print "basename: "+basename
+   print "simplename: "+simplename
+   print "extension: "+extension
+   print "replaced: "+name.replaceFirst(/.txt.gz$/, "_replaced.txt.gz")
+   exit 1, "Test finished..."
+}
 if ( (!params.fastq_path && !params.bam_path && !params.gvcf_path ) && !params.vcf_path){
   exit 1, "Please provide either a 'fastq_path', 'bam_path', 'gvcf_path' or 'vcf_path'. You can provide these parameters either in the <analysis_name>.config file or on the commandline (add -- in front of the parameter)."
 }
@@ -87,6 +105,74 @@ if ( params.runReport ) {
   } 
 }
 
+if ( !params.nextflowmodules_path ){
+  println "No NextflowModules path specified, assuming '$baseDir/NextflowModules'. Otherwise please specify it using --nextflowmodules_path or by setting it in the nextflow.config file"
+  params.nextflowmodules_path = "$baseDir/NextflowModules"
+  Channel
+        .fromPath( params.nextflowmodules_path, checkIfExists: true )
+        .ifEmpty { exit 1, "NextflowModules path not found: ${params.nextflowmodules_path}"}    
+  
+}
+
+
+def run_name
+if( params.fastq_path ){
+    run_name = params.fastq_path.split('/')[-1]
+} else if( params.bam_path ){
+    run_name = params.bam_path.split('/')[-1]
+} else if( params.gvcf_path ){
+    run_name = params.gvcf_path.split('/')[-1]
+} else {
+    run_name = params.vcf_path.split('/')[-1]
+}
+if ( params.custom_run_name) {
+    run_name = params.custom_run_name
+}
+
+//setup parameters
+if (params.germlineCalling){
+    params.genome_known_sites = params.genomes[params.genome].gatk_known_sites
+    params.genome_dbsnp = params.genomes[params.genome].dbsnp
+}
+
+if (params.variantAnnotation){
+    params.genome_dbnsfp = params.genomes[params.genome].dbnsfp
+    params.genome_variant_annotator_db = params.genomes[params.genome].cosmic
+    params.genome_snpsift_annotate_db = params.genomes[params.genome].gonl
+    //params.snpefffilter.optional = params.genomes[params.genome].snpefffilter.optional
+    params.snpeff_genome = params.genomes[params.genome].snpeff_genome
+    //params.snpeff_datadir = params.genomes[params.genome].snpeff_datadir
+
+    include { snpeff_gatk_annotate } from './workflows/snpeff_gatk_annotate.nf' params(params)
+}
+
+if (params.cnvCalling){
+    params.genome_freec_chr_len = params.genomes[params.genome].freec_chr_len
+    params.genome_freec_chr_files = params.genomes[params.genome].freec_chr_files
+    params.genome_freec_mappability = params.genomes[params.genome].freec_mappability
+
+    include { cnv_calling } from './workflows/cnv_calling.nf' params(params)
+}
+
+
+
+// modules
+include { extractAllFastqFromDir } from params.nextflowmodules_path+'/Utils/fastq.nf'
+include { extractBamFromDir } from params.nextflowmodules_path+'/Utils/bam.nf'
+include { extractGVCFFromDir } from params.nextflowmodules_path+'/Utils/gvcf.nf'
+include { extractVCFFromDir } from params.nextflowmodules_path+'/Utils/vcf.nf'
+include { SamToCram } from params.nextflowmodules_path+'/Samtools/1.16.1/SamToCram.nf'
+include { bwa_mapping } from './workflows/bwa_mapping.nf' params(params)
+include { premap_QC } from './workflows/premap_QC.nf' params(params)
+include { postmap_QC } from './workflows/postmap_QC.nf' params(params)
+include { gatk_bqsr } from './workflows/gatk_bqsr.nf' params(params)
+include { gatk_germline_calling } from './workflows/gatk_germline_calling.nf' params(params)
+include { gatk_variantfiltration } from './workflows/gatk_variantfiltration.nf' params(params)
+
+include { summary_QC } from './workflows/summary_QC.nf' params(params)
+include { sv_calling } from './workflows/sv_calling.nf' params(params)
+
+include { generate_report } from './workflows/generate_report.nf' params(params)
 
 /*=================================
           Run workflow
@@ -99,67 +185,57 @@ workflow {
 
     // Gather input FastQ's
     if (params.fastq_path){
-      include extractAllFastqFromDir from './NextflowModules/Utils/fastq.nf'
       input_fastqs = extractAllFastqFromDir(params.fastq_path).map{
         sample_id, rg_id, machine, run_nr,fastq_files -> [sample_id, rg_id,fastq_files]
       }
     }
     // Gather input BAM files
-    if (params.bam_path){
-      include extractBamFromDir from './NextflowModules/Utils/bam.nf'
+    if (params.bam_path){      
       input_bams = extractBamFromDir(params.bam_path)
     }
     // Gather input GVCF files
-    if (params.gvcf_path) {
-      include extractGVCFFromDir from './NextflowModules/Utils/gvcf.nf'
+    if (params.gvcf_path) {      
       input_gvcf = extractGVCFFromDir(params.gvcf_path)
     }
     //Gather input VCF files
-    if(params.vcf_path) {
-      include extractVCFFromDir from './NextflowModules/Utils/vcf.nf'
+    if(params.vcf_path) {      
       input_vcf = extractVCFFromDir(params.vcf_path)
     }
 
+    def mapped_bams
     // Run mapping & premap_QC only when a fastq_path is provided
-    if (params.fastq_path){
-      include bwa_mapping from './workflows/bwa_mapping.nf' params(params)
+    if (params.fastq_path){      
       // Optionally run pre mapping QC
-      if (params.premapQC) {
-        include premap_QC from './workflows/premap_QC.nf' params(params)
+      if (params.premapQC) {        
         premap_QC(input_fastqs)
       }
       bwa_mapping(input_fastqs)
+      //remaining processes expect [sample_id, bam, bai] while Sambamba v0.8.2 returns [sample_id, rg_id, bam, bai ]
+      mapped_bams = bwa_mapping.out.map {sample_id, rg_id, bam, bai -> 
+            [sample_id, bam, bai]}
     }
 
     // Create a channel containing the bam files from the bwa_mapping step and/or the bam files in bam_path
     if ( params.fastq_path && params.bam_path ){
-      input_bams = bwa_mapping.out.mix( input_bams )
+//      input_bams = bwa_mapping.out.mix( input_bams )
+      input_bams = mapped_bams.mix( input_bams )
     }else if ( params.fastq_path ){
-      input_bams = bwa_mapping.out
+      //input_bams = bwa_mapping.out
+      input_bams = mapped_bams
     }
+//    if( input_bams) {
+//        input_bams = input_bams.map {sample_id, rg_id, bam, bai -> 
+//            [sample_id, bam, bai]}
+//    }
 
     // Optionally run post mapping QC
-    if (params.postmapQC && input_bams) {
-      include postmap_QC from './workflows/postmap_QC.nf' params(params)
+    if (params.postmapQC && input_bams) {      
       postmap_QC( input_bams )
-    }
-
-    if (params.variantFiltration || params.germlineCalling){
-        include gatk_germline_calling from './workflows/gatk_germline_calling.nf' params(params)
-
-    }
-    if (params.variantAnnotation || params.variantFiltration){
-        include gatk_variantfiltration from './workflows/gatk_variantfiltration.nf' params(params)
     }
 
     // // Depending on whether input_bams and/or input_gvcf were provide start from gatk_bqsr or directly from gatk_germline_calling.
     // // gatk_germline_calling supports both bam and/or gvcf input (one of the channels can be empty)
     if (params.germlineCalling){
-
-      params.genome_known_sites = params.genomes[params.genome].gatk_known_sites
-      params.genome_dbsnp = params.genomes[params.genome].dbsnp
-      include gatk_bqsr from './workflows/gatk_bqsr.nf' params(params)
-      //include gatk_germline_calling from './workflows/gatk_germline_calling.nf' params(params)
 
       //apply BQSR when known sites are supplied, otherwise continue with original input bams
       def bqsr_bams
@@ -195,72 +271,42 @@ workflow {
 
     //Run variant annotation on filtered vcfs or input vcfs
     if (params.variantAnnotation){
-      params.genome_dbnsfp = params.genomes[params.genome].dbnsfp
-      params.genome_variant_annotator_db = params.genomes[params.genome].cosmic
-      params.genome_snpsift_annotate_db = params.genomes[params.genome].gonl
-      include snpeff_gatk_annotate from './workflows/snpeff_gatk_annotate.nf' params(params)
 
-      if (gatk_variantfiltration.out){
+      if (params.variantFiltration && gatk_variantfiltration.out){
         snpeff_gatk_annotate(gatk_variantfiltration.out)
       }else if(input_vcf){
         snpeff_gatk_annotate(input_vcf)
       }
     }
-    //Test code
-    // if (params.splitVCF && !params.vcf_path){
-    //   if (input_bams && input_gvcf){
-    //     input_bams.mix(input_gvcf).map{
-    //       sample_id, file,idx -> sample_id
-    //     }
-    //     .unique()
-    //     .view()
-    //   }else if(input_bams){
-    //     input_bams.map{
-    //       sample_id, file,idx -> sample_id
-    //     }
-    //     .view()
-    //   }else if(input_gvcf){
-    //     input_gvcf.map{
-    //       sample_id, file,idx -> sample_id
-    //     }
-    //     .view()
-    //   }
-    // }
-
-
+    
     // Run summary_QC only when both pre- and post-mapping QC are finished.
-    if (params.premapQC && params.postmapQC && input_fastqs && input_bams){
-      include summary_QC from './workflows/summary_QC.nf' params(params)
-      summary_QC( premap_QC.out
+    if (params.premapQC && params.postmapQC && input_fastqs && input_bams){      
+      summary_QC( run_name, premap_QC.out
         .mix(postmap_QC.out[0]).collect()
         .mix(postmap_QC.out[1]).collect()
       )
     }else if (params.premapQC && input_fastqs){
-      include summary_QC from './workflows/summary_QC.nf' params(params)
       summary_QC(premap_QC.out.collect())
     }else if (params.postmapQC  && input_bams){
-      include summary_QC from './workflows/summary_QC.nf' params(params)
       summary_QC(postmap_QC.out[0].collect())
     }
 
     // Run sv calling only when either bam-files or fastq files were provided as input and svCalling is true
-    if (params.svCalling && input_bams ){
-      include sv_calling from './workflows/sv_calling.nf' params(params)
+    if (params.svCalling && input_bams ){      
       sv_calling(input_bams)
     }
 
     // Run cnv calling only when either bam-files or fastq files were provided as input and cnvCalling is true
     if (params.cnvCalling && input_bams){
-      params.genome_freec_chr_len = params.genomes[params.genome].freec_chr_len
-      params.genome_freec_chr_files = params.genomes[params.genome].freec_chr_files
-      params.genome_freec_mappability = params.genomes[params.genome].freec_mappability
-      include cnv_calling from './workflows/cnv_calling.nf' params(params)
       cnv_calling(input_bams)
     }
 
+    if ( params.saveCram && input_bams) {
+        compress_bams = input_bams.map{sample_id, bam, bai -> [bam, bai]}
+        SamToCram(compress_bams, params.genome_fasta) 
+    } 
     //
-    if ( params.runReport ) {
-        include { generate_report } from './workflows/generate_report.nf' params(params)
+    if ( params.runReport ) {        
         generate_report ( "NF-IAP_report", report_template )
     }
 }

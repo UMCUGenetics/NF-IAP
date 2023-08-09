@@ -1,8 +1,8 @@
-include BaseRecalibrationTable from '../NextflowModules/GATK/4.1.3.0/BaseRecalibrationTable.nf' params(mem: "${params.baserecalibrator.mem}", genome_fasta: "${params.genome_fasta}", genome_known_sites: params.genome_known_sites )
-include BaseRecalibration from '../NextflowModules/GATK/4.1.3.0/BaseRecalibration.nf' params(mem: "${params.applybqsr.mem}", genome_fasta: "${params.genome_fasta}")
-include GatherBaseRecalibrationTables from '../NextflowModules/GATK/4.1.3.0/GatherBaseRecalibrationTables.nf' params(mem: "${params.gatherbaserecalibrator.mem}")
-include MergeBams from '../NextflowModules/Sambamba/0.6.8/MergeBams.nf' params(mem: "${params.mergebams.mem}")
-include SplitIntervals from '../NextflowModules/GATK/4.1.3.0/SplitIntervals.nf' params(optional: "${params.splitintervals.optional}")
+include { BaseRecalibrationTable } from params.nextflowmodules_path+'/GATK/4.3.0.0/BaseRecalibrationTable.nf' params(mem: "${params.baserecalibrator.mem}", genome_fasta: "${params.genome_fasta}", genome_known_sites: params.genome_known_sites )
+include { BaseRecalibration } from params.nextflowmodules_path+'/GATK/4.3.0.0/BaseRecalibration.nf' params(mem: "${params.applybqsr.mem}", genome_fasta: "${params.genome_fasta}")
+include { GatherBaseRecalibrationTables } from params.nextflowmodules_path+'/GATK/4.3.0.0/GatherBaseRecalibrationTables.nf' params(mem: "${params.gatherbaserecalibrator.mem}")
+include { MergeBams } from params.nextflowmodules_path+'/Sambamba/0.8.2/MergeBams.nf' params(mem: "${params.mergebams.mem}")
+include { SplitIntervals } from params.nextflowmodules_path+'/GATK/4.3.0.0/SplitIntervals.nf' params(optional: "${params.splitintervals.optional}")
 
 workflow gatk_bqsr {
   take:

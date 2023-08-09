@@ -1,4 +1,4 @@
-include Freec from '../NextflowModules/ControlFREEC/11.5/Freec.nf' params(
+include { Freec } from params.nextflowmodules_path+'/ControlFREEC/11.6/Freec.nf' params(
   mem: "${params.freec.mem}",
   chr_len_file: "${params.genome_freec_chr_len}",
   chr_files: "${params.genome_freec_chr_files}",
@@ -7,9 +7,10 @@ include Freec from '../NextflowModules/ControlFREEC/11.5/Freec.nf' params(
   window : "${params.freec_window}",
   telocentromeric : "${params.freec_telocentromeric}"
 )
-include AssessSignificance from '../NextflowModules/ControlFREEC/11.5/AssessSignificance.nf' params()
-include MakeGraph from '../NextflowModules/ControlFREEC/11.5/MakeGraph.nf' params(ploidy: "${params.freec_ploidy}")
-include MakeKaryotype from '../NextflowModules/ControlFREEC/11.5/MakeKaryotype.nf' params(ploidy: "${params.freec_ploidy}",telocentromeric : "${params.freec_telocentromeric}", maxlevel: "${params.freec_maxlevel}")
+include { AssessSignificance } from params.nextflowmodules_path+'/ControlFREEC/11.6/AssessSignificance.nf' params()
+include { MakeGraph } from params.nextflowmodules_path+'/ControlFREEC/11.6/MakeGraph.nf' params(ploidy: "${params.freec_ploidy}")
+include { MakeGraphChromosome } from params.nextflowmodules_path+'/ControlFREEC/11.6/MakeGraphChromosome.nf' params(ploidy: "${params.freec_ploidy}")
+include { MakeKaryotype } from params.nextflowmodules_path+'/ControlFREEC/11.6/MakeKaryotype.nf' params(ploidy: "${params.freec_ploidy}",telocentromeric : "${params.freec_telocentromeric}", maxlevel: "${params.freec_maxlevel}")
 
 
 workflow cnv_calling {
@@ -19,12 +20,14 @@ workflow cnv_calling {
     Freec(sample_bams)
     AssessSignificance(Freec.out.cnv)
     MakeGraph(Freec.out.cnv)
-    MakeKaryotype(Freec.out.cnv)
+    MakeGraphChromosome(Freec.out.cnv)
+//    MakeKaryotype(Freec.out.cnv)
 
   emit:
     Freec.out.cnv
     Freec.out.other
     AssessSignificance.out
     MakeGraph.out
-    MakeKaryotype.out
+    MakeGraphChromosome.out
+//    MakeKaryotype.out
 }
